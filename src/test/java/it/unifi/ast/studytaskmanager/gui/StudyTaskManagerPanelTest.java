@@ -133,6 +133,20 @@ class StudyTaskManagerPanelTest {
         assertThat(panel.selectedTaskId()).isEmpty();
     }
 
+
+    @Test
+    void executesDeleteTaskActionWhenButtonIsClicked() throws Exception {
+        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
+        AtomicBoolean actionExecuted = new AtomicBoolean(false);
+
+        SwingUtilities.invokeAndWait(() -> {
+            panel.setDeleteTaskAction(() -> actionExecuted.set(true));
+            panel.getDeleteTaskButton().doClick();
+        });
+
+        assertThat(actionExecuted).isTrue();
+    }
+
     private StudyTaskManagerPanel createPanelOnEventDispatchThread()
             throws InvocationTargetException, InterruptedException {
         AtomicReference<StudyTaskManagerPanel> panelReference = new AtomicReference<>();

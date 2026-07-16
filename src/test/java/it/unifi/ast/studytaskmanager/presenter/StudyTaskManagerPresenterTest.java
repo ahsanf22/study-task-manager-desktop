@@ -206,5 +206,39 @@ class StudyTaskManagerPresenterTest {
         verify(studyTaskService, never()).markCompleted(org.mockito.ArgumentMatchers.anyLong());
     }
 
+
+    @Test
+    void deletesSelectedTaskAndReloadsData() {
+        List<Category> categories = List.of(new Category("Math"));
+        List<StudyTask> tasks = List.of();
+
+        when(view.selectedTaskId()).thenReturn(Optional.of(1L));
+        when(categoryService.findAll()).thenReturn(categories);
+        when(studyTaskService.findAll()).thenReturn(tasks);
+
+        StudyTaskManagerPresenter presenter =
+                new StudyTaskManagerPresenter(view, categoryService, studyTaskService);
+
+        presenter.deleteSelectedTask();
+
+        verify(studyTaskService).deleteTask(1L);
+        verify(view).showCategories(categories);
+        verify(view).showTasks(tasks);
+    }
+
+    @Test
+    void showsErrorWhenDeletingTaskWithoutSelection() {
+        when(view.selectedTaskId()).thenReturn(Optional.empty());
+
+        StudyTaskManagerPresenter presenter =
+                new StudyTaskManagerPresenter(view, categoryService, studyTaskService);
+
+        presenter.deleteSelectedTask();
+
+        verify(view).showError("Please select a task to delete.");
+        verify(studyTaskService, never()).deleteTask(org.mockito.ArgumentMatchers.anyLong());
+    }
+
 }
+
 

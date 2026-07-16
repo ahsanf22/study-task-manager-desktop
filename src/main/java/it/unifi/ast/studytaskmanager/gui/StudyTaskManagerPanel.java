@@ -191,6 +191,11 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
         completeTaskButton.addActionListener(event -> action.run());
     }
 
+    @Override
+    public void setDeleteTaskAction(Runnable action) {
+        deleteTaskButton.addActionListener(event -> action.run());
+    }
+
     public JTable getCategoryTable() {
         return categoryTable;
     }

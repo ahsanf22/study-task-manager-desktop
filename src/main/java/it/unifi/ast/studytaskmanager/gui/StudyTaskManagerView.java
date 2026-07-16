@@ -25,4 +25,6 @@ public interface StudyTaskManagerView {
     void setAddTaskAction(Runnable action);
 
     void setCompleteTaskAction(Runnable action);
+
+    void setDeleteTaskAction(Runnable action);
 }
