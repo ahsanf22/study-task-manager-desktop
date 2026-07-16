@@ -2,19 +2,23 @@ package it.unifi.ast.studytaskmanager.gui;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 import it.unifi.ast.studytaskmanager.model.Category;
+import it.unifi.ast.studytaskmanager.model.Priority;
 import it.unifi.ast.studytaskmanager.model.StudyTask;
 
 public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerView {
@@ -102,8 +106,58 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
     }
 
     @Override
+    public Optional<TaskFormData> askForTaskDetails(List<Category> categories) {
+        JTextField titleField = new JTextField();
+        JTextField descriptionField = new JTextField();
+        JTextField deadlineField = new JTextField(LocalDate.now().plusDays(7).toString());
+
+        JComboBox<Priority> priorityComboBox = new JComboBox<>(Priority.values());
+        JComboBox<CategoryItem> categoryComboBox = new JComboBox<>(
+                categories.stream()
+                        .map(category -> new CategoryItem(category.getId(), category.getName()))
+                        .toArray(CategoryItem[]::new));
+
+        JPanel form = new JPanel(new GridLayout(5, 2, 10, 10));
+        form.add(new JLabel("Title:"));
+        form.add(titleField);
+        form.add(new JLabel("Description:"));
+        form.add(descriptionField);
+        form.add(new JLabel("Priority:"));
+        form.add(priorityComboBox);
+        form.add(new JLabel("Deadline yyyy-MM-dd:"));
+        form.add(deadlineField);
+        form.add(new JLabel("Category:"));
+        form.add(categoryComboBox);
+
+        int result = JOptionPane.showConfirmDialog(
+                this,
+                form,
+                "Add Task",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE);
+
+        if (result != JOptionPane.OK_OPTION) {
+            return Optional.empty();
+        }
+
+        CategoryItem selectedCategory = (CategoryItem) categoryComboBox.getSelectedItem();
+
+        return Optional.of(new TaskFormData(
+                titleField.getText(),
+                descriptionField.getText(),
+                (Priority) priorityComboBox.getSelectedItem(),
+                LocalDate.parse(deadlineField.getText().trim()),
+                selectedCategory.id()));
+    }
+
+    @Override
     public void setAddCategoryAction(Runnable action) {
         addCategoryButton.addActionListener(event -> action.run());
+    }
+
+    @Override
+    public void setAddTaskAction(Runnable action) {
+        addTaskButton.addActionListener(event -> action.run());
     }
 
     public JTable getCategoryTable() {
@@ -199,6 +253,14 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
         }
 
         return task.getCategory().getName();
+    }
+
+    private record CategoryItem(Long id, String name) {
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 
     private static final class NonEditableTableModel extends DefaultTableModel {

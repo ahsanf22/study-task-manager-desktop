@@ -16,5 +16,9 @@ public interface StudyTaskManagerView {
 
     Optional<String> askForCategoryName();
 
+    Optional<TaskFormData> askForTaskDetails(List<Category> categories);
+
     void setAddCategoryAction(Runnable action);
+
+    void setAddTaskAction(Runnable action);
 }
