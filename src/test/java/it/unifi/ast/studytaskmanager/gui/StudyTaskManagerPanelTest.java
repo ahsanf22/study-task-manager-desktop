@@ -84,6 +84,20 @@ class StudyTaskManagerPanelTest {
         assertThat(actionExecuted).isTrue();
     }
 
+
+    @Test
+    void executesAddTaskActionWhenButtonIsClicked() throws Exception {
+        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
+        AtomicBoolean actionExecuted = new AtomicBoolean(false);
+
+        SwingUtilities.invokeAndWait(() -> {
+            panel.setAddTaskAction(() -> actionExecuted.set(true));
+            panel.getAddTaskButton().doClick();
+        });
+
+        assertThat(actionExecuted).isTrue();
+    }
+
     private StudyTaskManagerPanel createPanelOnEventDispatchThread()
             throws InvocationTargetException, InterruptedException {
         AtomicReference<StudyTaskManagerPanel> panelReference = new AtomicReference<>();

@@ -2,10 +2,12 @@ package it.unifi.ast.studytaskmanager.presenter;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +17,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import it.unifi.ast.studytaskmanager.gui.StudyTaskManagerView;
+import it.unifi.ast.studytaskmanager.gui.TaskFormData;
 import it.unifi.ast.studytaskmanager.model.Category;
+import it.unifi.ast.studytaskmanager.model.Priority;
 import it.unifi.ast.studytaskmanager.model.StudyTask;
 import it.unifi.ast.studytaskmanager.service.CategoryService;
 import it.unifi.ast.studytaskmanager.service.StudyTaskService;
@@ -104,5 +108,69 @@ class StudyTaskManagerPresenterTest {
         presenter.addCategory();
 
         verify(categoryService, never()).createCategory(anyString());
+    }
+
+    @Test
+    void addsTaskAndReloadsData() {
+        Category category = new Category("Math");
+        List<Category> categories = List.of(category);
+        TaskFormData taskFormData = new TaskFormData(
+                " Read Chapter 1 ",
+                " RRTC preparation ",
+                Priority.HIGH,
+                LocalDate.of(2026, 7, 20),
+                1L);
+
+        when(categoryService.findAll()).thenReturn(categories);
+        when(view.askForTaskDetails(categories)).thenReturn(Optional.of(taskFormData));
+        when(studyTaskService.findAll()).thenReturn(List.of());
+
+        StudyTaskManagerPresenter presenter =
+                new StudyTaskManagerPresenter(view, categoryService, studyTaskService);
+
+        presenter.addTask();
+
+        verify(studyTaskService).createTask(
+                "Read Chapter 1",
+                "RRTC preparation",
+                Priority.HIGH,
+                LocalDate.of(2026, 7, 20),
+                1L);
+        verify(categoryService, times(2)).findAll();
+        verify(view).showCategories(categories);
+        verify(view).showTasks(List.of());
+    }
+
+    @Test
+    void doesNotAddTaskWhenThereAreNoCategories() {
+        when(categoryService.findAll()).thenReturn(List.of());
+
+        StudyTaskManagerPresenter presenter =
+                new StudyTaskManagerPresenter(view, categoryService, studyTaskService);
+
+        presenter.addTask();
+
+        verify(view).showError("Please create a category before adding a task.");
+        verifyNoInteractions(studyTaskService);
+    }
+
+    @Test
+    void doesNotAddTaskWhenDialogIsCancelled() {
+        List<Category> categories = List.of(new Category("Math"));
+
+        when(categoryService.findAll()).thenReturn(categories);
+        when(view.askForTaskDetails(categories)).thenReturn(Optional.empty());
+
+        StudyTaskManagerPresenter presenter =
+                new StudyTaskManagerPresenter(view, categoryService, studyTaskService);
+
+        presenter.addTask();
+
+        verify(studyTaskService, never()).createTask(
+                anyString(),
+                anyString(),
+                org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.anyLong());
     }
 }
