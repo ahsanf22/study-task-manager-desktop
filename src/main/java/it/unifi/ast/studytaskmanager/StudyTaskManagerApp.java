@@ -1,9 +1,13 @@
 package it.unifi.ast.studytaskmanager;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import it.unifi.ast.studytaskmanager.config.ApplicationConfiguration;
 import it.unifi.ast.studytaskmanager.gui.MainFrame;
-import it.unifi.ast.studytaskmanager.gui.StudyTaskManagerPanel;
 
 public final class StudyTaskManagerApp {
 
@@ -17,7 +21,24 @@ public final class StudyTaskManagerApp {
     }
 
     static void showApplication() {
-        MainFrame frame = new MainFrame(new StudyTaskManagerPanel());
-        frame.setVisible(true);
+        try {
+            ApplicationConfiguration configuration = ApplicationConfiguration.create();
+            MainFrame frame = configuration.createMainFrame();
+
+            frame.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosed(WindowEvent event) {
+                    configuration.close();
+                }
+            });
+
+            frame.setVisible(true);
+        } catch (RuntimeException exception) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Could not start application: " + exception.getMessage(),
+                    APPLICATION_NAME,
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }
 }

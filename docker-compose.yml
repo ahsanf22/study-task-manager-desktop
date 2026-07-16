@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: study-task-manager-postgres
+    environment:
+      POSTGRES_DB: study_task_manager
+      POSTGRES_USER: study
+      POSTGRES_PASSWORD: study
+    ports:
+      - "5433:5432"
+    volumes:
+      - study-task-manager-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  study-task-manager-postgres-data:
