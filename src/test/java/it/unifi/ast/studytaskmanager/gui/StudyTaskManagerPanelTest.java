@@ -147,6 +147,40 @@ class StudyTaskManagerPanelTest {
         assertThat(actionExecuted).isTrue();
     }
 
+
+    @Test
+    void executesDeleteCategoryActionWhenButtonIsClicked() throws Exception {
+        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
+        AtomicBoolean actionExecuted = new AtomicBoolean(false);
+
+        SwingUtilities.invokeAndWait(() -> {
+            panel.setDeleteCategoryAction(() -> actionExecuted.set(true));
+            panel.getDeleteCategoryButton().doClick();
+        });
+
+        assertThat(actionExecuted).isTrue();
+    }
+
+    @Test
+    void returnsSelectedCategoryId() throws Exception {
+        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
+
+        SwingUtilities.invokeAndWait(() -> {
+            DefaultTableModel model = (DefaultTableModel) panel.getCategoryTable().getModel();
+            model.addRow(new Object[] { 99L, "Math" });
+            panel.getCategoryTable().setRowSelectionInterval(0, 0);
+        });
+
+        assertThat(panel.selectedCategoryId()).contains(99L);
+    }
+
+    @Test
+    void returnsEmptySelectedCategoryIdWhenNoCategoryIsSelected() throws Exception {
+        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
+
+        assertThat(panel.selectedCategoryId()).isEmpty();
+    }
+
     private StudyTaskManagerPanel createPanelOnEventDispatchThread()
             throws InvocationTargetException, InterruptedException {
         AtomicReference<StudyTaskManagerPanel> panelReference = new AtomicReference<>();

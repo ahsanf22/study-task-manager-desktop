@@ -23,6 +23,7 @@ public class StudyTaskManagerPresenter {
         this.studyTaskService = studyTaskService;
 
         this.view.setAddCategoryAction(this::addCategory);
+        this.view.setDeleteCategoryAction(this::deleteSelectedCategory);
         this.view.setAddTaskAction(this::addTask);
         this.view.setCompleteTaskAction(this::completeSelectedTask);
         this.view.setDeleteTaskAction(this::deleteSelectedTask);
@@ -44,6 +45,17 @@ public class StudyTaskManagerPresenter {
                     .ifPresent(this::createCategoryAndReload);
         } catch (RuntimeException exception) {
             view.showError("Could not add category: " + exception.getMessage());
+        }
+    }
+
+    public void deleteSelectedCategory() {
+        try {
+            view.selectedCategoryId()
+                    .ifPresentOrElse(
+                            this::deleteCategoryAndReload,
+                            () -> view.showError("Please select a category to delete."));
+        } catch (RuntimeException exception) {
+            view.showError("Could not delete category: " + exception.getMessage());
         }
     }
 
@@ -88,6 +100,11 @@ public class StudyTaskManagerPresenter {
 
     private void createCategoryAndReload(String categoryName) {
         categoryService.createCategory(categoryName);
+        reloadData();
+    }
+
+    private void deleteCategoryAndReload(Long categoryId) {
+        categoryService.deleteCategory(categoryId);
         reloadData();
     }
 

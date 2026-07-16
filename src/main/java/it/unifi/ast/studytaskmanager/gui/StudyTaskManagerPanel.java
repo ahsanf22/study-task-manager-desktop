@@ -28,6 +28,7 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
     public static final String CATEGORY_TABLE_NAME = "categoryTable";
     public static final String TASK_TABLE_NAME = "taskTable";
     public static final String ADD_CATEGORY_BUTTON_NAME = "addCategoryButton";
+    public static final String DELETE_CATEGORY_BUTTON_NAME = "deleteCategoryButton";
     public static final String ADD_TASK_BUTTON_NAME = "addTaskButton";
     public static final String COMPLETE_TASK_BUTTON_NAME = "completeTaskButton";
     public static final String DELETE_TASK_BUTTON_NAME = "deleteTaskButton";
@@ -35,6 +36,7 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
     private final JTable categoryTable;
     private final JTable taskTable;
     private final JButton addCategoryButton;
+    private final JButton deleteCategoryButton;
     private final JButton addTaskButton;
     private final JButton completeTaskButton;
     private final JButton deleteTaskButton;
@@ -46,6 +48,7 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
         taskTable = createTaskTable();
 
         addCategoryButton = createButton("Add Category", ADD_CATEGORY_BUTTON_NAME);
+        deleteCategoryButton = createButton("Delete Category", DELETE_CATEGORY_BUTTON_NAME);
         addTaskButton = createButton("Add Task", ADD_TASK_BUTTON_NAME);
         completeTaskButton = createButton("Complete Task", COMPLETE_TASK_BUTTON_NAME);
         deleteTaskButton = createButton("Delete Task", DELETE_TASK_BUTTON_NAME);
@@ -151,6 +154,32 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
     }
 
     @Override
+    public Optional<Long> selectedCategoryId() {
+        int selectedRow = categoryTable.getSelectedRow();
+
+        if (selectedRow < 0) {
+            return Optional.empty();
+        }
+
+        int modelRow = categoryTable.convertRowIndexToModel(selectedRow);
+        Object idValue = categoryTable.getModel().getValueAt(modelRow, 0);
+
+        if (idValue == null) {
+            return Optional.empty();
+        }
+
+        if (idValue instanceof Long id) {
+            return Optional.of(id);
+        }
+
+        if (idValue instanceof Number number) {
+            return Optional.of(number.longValue());
+        }
+
+        return Optional.of(Long.valueOf(idValue.toString()));
+    }
+
+    @Override
     public Optional<Long> selectedTaskId() {
         int selectedRow = taskTable.getSelectedRow();
 
@@ -182,6 +211,11 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
     }
 
     @Override
+    public void setDeleteCategoryAction(Runnable action) {
+        deleteCategoryButton.addActionListener(event -> action.run());
+    }
+
+    @Override
     public void setAddTaskAction(Runnable action) {
         addTaskButton.addActionListener(event -> action.run());
     }
@@ -206,6 +240,10 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
 
     public JButton getAddCategoryButton() {
         return addCategoryButton;
+    }
+
+    public JButton getDeleteCategoryButton() {
+        return deleteCategoryButton;
     }
 
     public JButton getAddTaskButton() {
@@ -238,9 +276,10 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
     }
 
     private JPanel createButtonsPanel() {
-        JPanel buttonsPanel = new JPanel(new GridLayout(1, 4, 10, 0));
+        JPanel buttonsPanel = new JPanel(new GridLayout(1, 5, 10, 0));
 
         buttonsPanel.add(addCategoryButton);
+        buttonsPanel.add(deleteCategoryButton);
         buttonsPanel.add(addTaskButton);
         buttonsPanel.add(completeTaskButton);
         buttonsPanel.add(deleteTaskButton);
