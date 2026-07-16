@@ -1,10 +1,13 @@
 package it.unifi.ast.studytaskmanager.presenter;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -59,5 +62,47 @@ class StudyTaskManagerPresenterTest {
 
         verify(view).showError("Could not load data: database unavailable");
         verifyNoInteractions(studyTaskService);
+    }
+
+    @Test
+    void addsCategoryAndReloadsData() {
+        List<Category> categories = List.of(new Category("Math"));
+
+        when(view.askForCategoryName()).thenReturn(Optional.of(" Math "));
+        when(categoryService.findAll()).thenReturn(categories);
+        when(studyTaskService.findAll()).thenReturn(List.of());
+
+        StudyTaskManagerPresenter presenter =
+                new StudyTaskManagerPresenter(view, categoryService, studyTaskService);
+
+        presenter.addCategory();
+
+        verify(categoryService).createCategory("Math");
+        verify(view).showCategories(categories);
+        verify(view).showTasks(List.of());
+    }
+
+    @Test
+    void doesNotAddCategoryWhenInputIsEmpty() {
+        when(view.askForCategoryName()).thenReturn(Optional.of("   "));
+
+        StudyTaskManagerPresenter presenter =
+                new StudyTaskManagerPresenter(view, categoryService, studyTaskService);
+
+        presenter.addCategory();
+
+        verify(categoryService, never()).createCategory(anyString());
+    }
+
+    @Test
+    void doesNotAddCategoryWhenDialogIsCancelled() {
+        when(view.askForCategoryName()).thenReturn(Optional.empty());
+
+        StudyTaskManagerPresenter presenter =
+                new StudyTaskManagerPresenter(view, categoryService, studyTaskService);
+
+        presenter.addCategory();
+
+        verify(categoryService, never()).createCategory(anyString());
     }
 }

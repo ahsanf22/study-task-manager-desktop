@@ -3,6 +3,7 @@ package it.unifi.ast.studytaskmanager.gui;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -87,6 +88,22 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
                 message,
                 "Study Task Manager",
                 JOptionPane.ERROR_MESSAGE);
+    }
+
+    @Override
+    public Optional<String> askForCategoryName() {
+        String categoryName = JOptionPane.showInputDialog(
+                this,
+                "Category name:",
+                "Add Category",
+                JOptionPane.PLAIN_MESSAGE);
+
+        return Optional.ofNullable(categoryName);
+    }
+
+    @Override
+    public void setAddCategoryAction(Runnable action) {
+        addCategoryButton.addActionListener(event -> action.run());
     }
 
     public JTable getCategoryTable() {

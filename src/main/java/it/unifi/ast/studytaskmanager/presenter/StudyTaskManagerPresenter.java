@@ -17,14 +17,36 @@ public class StudyTaskManagerPresenter {
         this.view = view;
         this.categoryService = categoryService;
         this.studyTaskService = studyTaskService;
+
+        this.view.setAddCategoryAction(this::addCategory);
     }
 
     public void loadInitialData() {
         try {
-            view.showCategories(categoryService.findAll());
-            view.showTasks(studyTaskService.findAll());
+            reloadData();
         } catch (RuntimeException exception) {
             view.showError("Could not load data: " + exception.getMessage());
         }
+    }
+
+    public void addCategory() {
+        try {
+            view.askForCategoryName()
+                    .map(String::trim)
+                    .filter(name -> !name.isEmpty())
+                    .ifPresent(this::createCategoryAndReload);
+        } catch (RuntimeException exception) {
+            view.showError("Could not add category: " + exception.getMessage());
+        }
+    }
+
+    private void createCategoryAndReload(String categoryName) {
+        categoryService.createCategory(categoryName);
+        reloadData();
+    }
+
+    private void reloadData() {
+        view.showCategories(categoryService.findAll());
+        view.showTasks(studyTaskService.findAll());
     }
 }

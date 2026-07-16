@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.JButton;
@@ -68,6 +69,19 @@ class StudyTaskManagerPanelTest {
 
         assertThat(panel.getCategoryTable().getRowCount()).isEqualTo(1);
         assertThat(panel.getCategoryTable().getValueAt(0, 1)).isEqualTo("Math");
+    }
+
+    @Test
+    void executesAddCategoryActionWhenButtonIsClicked() throws Exception {
+        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
+        AtomicBoolean actionExecuted = new AtomicBoolean(false);
+
+        SwingUtilities.invokeAndWait(() -> {
+            panel.setAddCategoryAction(() -> actionExecuted.set(true));
+            panel.getAddCategoryButton().doClick();
+        });
+
+        assertThat(actionExecuted).isTrue();
     }
 
     private StudyTaskManagerPanel createPanelOnEventDispatchThread()
