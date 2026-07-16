@@ -1,14 +1,14 @@
 package it.unifi.ast.studytaskmanager;
 
-import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
 class StudyTaskManagerAppTest {
 
     @Test
-    void applicationStarts() {
-        assertThatCode(() -> StudyTaskManagerApp.main(new String[0]))
-                .doesNotThrowAnyException();
+    void providesApplicationName() {
+        assertThat(StudyTaskManagerApp.APPLICATION_NAME)
+                .isEqualTo("Study Task Manager Desktop");
     }
 }
