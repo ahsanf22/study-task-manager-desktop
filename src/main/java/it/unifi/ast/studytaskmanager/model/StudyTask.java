@@ -91,6 +91,19 @@ public class StudyTask {
         return category;
     }
 
+    public void updateDetails(
+            String title,
+            String description,
+            Priority priority,
+            LocalDate deadline,
+            Category category) {
+        this.title = normalizeTitle(title);
+        this.description = description;
+        this.priority = Objects.requireNonNull(priority, "Priority must not be null");
+        this.deadline = Objects.requireNonNull(deadline, "Deadline must not be null");
+        this.category = Objects.requireNonNull(category, "Category must not be null");
+    }
+
     public void markCompleted() {
         status = TaskStatus.COMPLETED;
     }
