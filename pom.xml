@@ -20,7 +20,7 @@
         <mockito.version>5.15.2</mockito.version>
         <hibernate.version>6.6.4.Final</hibernate.version>
         <postgresql.version>42.7.4</postgresql.version>
-        <testcontainers.version>1.20.4</testcontainers.version>
+        <testcontainers.version>1.21.4</testcontainers.version>
         <jacoco.version>0.8.12</jacoco.version>
         <pit.version>1.17.4</pit.version>
     </properties>
