@@ -2,16 +2,21 @@ package it.unifi.ast.studytaskmanager.gui;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-public class StudyTaskManagerPanel extends JPanel {
+import it.unifi.ast.studytaskmanager.model.Category;
+import it.unifi.ast.studytaskmanager.model.StudyTask;
+
+public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerView {
 
     private static final long serialVersionUID = 1L;
 
@@ -43,6 +48,45 @@ public class StudyTaskManagerPanel extends JPanel {
         add(createHeader(), BorderLayout.NORTH);
         add(createTablesPanel(), BorderLayout.CENTER);
         add(createButtonsPanel(), BorderLayout.SOUTH);
+    }
+
+    @Override
+    public void showCategories(List<Category> categories) {
+        DefaultTableModel model = tableModel(categoryTable);
+        model.setRowCount(0);
+
+        for (Category category : categories) {
+            model.addRow(new Object[] {
+                    category.getId(),
+                    category.getName()
+            });
+        }
+    }
+
+    @Override
+    public void showTasks(List<StudyTask> tasks) {
+        DefaultTableModel model = tableModel(taskTable);
+        model.setRowCount(0);
+
+        for (StudyTask task : tasks) {
+            model.addRow(new Object[] {
+                    task.getId(),
+                    task.getTitle(),
+                    categoryName(task),
+                    task.getPriority(),
+                    task.getDeadline(),
+                    task.getStatus()
+            });
+        }
+    }
+
+    @Override
+    public void showError(String message) {
+        JOptionPane.showMessageDialog(
+                this,
+                message,
+                "Study Task Manager",
+                JOptionPane.ERROR_MESSAGE);
     }
 
     public JTable getCategoryTable() {
@@ -126,6 +170,18 @@ public class StudyTaskManagerPanel extends JPanel {
         button.setName(name);
 
         return button;
+    }
+
+    private DefaultTableModel tableModel(JTable table) {
+        return (DefaultTableModel) table.getModel();
+    }
+
+    private String categoryName(StudyTask task) {
+        if (task.getCategory() == null) {
+            return "";
+        }
+
+        return task.getCategory().getName();
     }
 
     private static final class NonEditableTableModel extends DefaultTableModel {

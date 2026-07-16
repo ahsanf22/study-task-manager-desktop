@@ -3,6 +3,7 @@ package it.unifi.ast.studytaskmanager.gui;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.JButton;
@@ -10,6 +11,8 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 
 import org.junit.jupiter.api.Test;
+
+import it.unifi.ast.studytaskmanager.model.Category;
 
 class StudyTaskManagerPanelTest {
 
@@ -55,6 +58,16 @@ class StudyTaskManagerPanelTest {
         assertThat(panel.getTaskTable().getColumnName(3)).isEqualTo("Priority");
         assertThat(panel.getTaskTable().getColumnName(4)).isEqualTo("Deadline");
         assertThat(panel.getTaskTable().getColumnName(5)).isEqualTo("Status");
+    }
+
+    @Test
+    void displaysCategoriesInCategoryTable() throws Exception {
+        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
+
+        SwingUtilities.invokeAndWait(() -> panel.showCategories(List.of(new Category("Math"))));
+
+        assertThat(panel.getCategoryTable().getRowCount()).isEqualTo(1);
+        assertThat(panel.getCategoryTable().getValueAt(0, 1)).isEqualTo("Math");
     }
 
     private StudyTaskManagerPanel createPanelOnEventDispatchThread()
