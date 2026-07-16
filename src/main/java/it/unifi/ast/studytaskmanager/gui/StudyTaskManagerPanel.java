@@ -151,6 +151,32 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
     }
 
     @Override
+    public Optional<Long> selectedTaskId() {
+        int selectedRow = taskTable.getSelectedRow();
+
+        if (selectedRow < 0) {
+            return Optional.empty();
+        }
+
+        int modelRow = taskTable.convertRowIndexToModel(selectedRow);
+        Object idValue = taskTable.getModel().getValueAt(modelRow, 0);
+
+        if (idValue == null) {
+            return Optional.empty();
+        }
+
+        if (idValue instanceof Long id) {
+            return Optional.of(id);
+        }
+
+        if (idValue instanceof Number number) {
+            return Optional.of(number.longValue());
+        }
+
+        return Optional.of(Long.valueOf(idValue.toString()));
+    }
+
+    @Override
     public void setAddCategoryAction(Runnable action) {
         addCategoryButton.addActionListener(event -> action.run());
     }
@@ -158,6 +184,11 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
     @Override
     public void setAddTaskAction(Runnable action) {
         addTaskButton.addActionListener(event -> action.run());
+    }
+
+    @Override
+    public void setCompleteTaskAction(Runnable action) {
+        completeTaskButton.addActionListener(event -> action.run());
     }
 
     public JTable getCategoryTable() {

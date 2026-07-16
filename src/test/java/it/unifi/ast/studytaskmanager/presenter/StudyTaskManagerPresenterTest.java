@@ -173,4 +173,38 @@ class StudyTaskManagerPresenterTest {
                 org.mockito.ArgumentMatchers.any(),
                 org.mockito.ArgumentMatchers.anyLong());
     }
+
+    @Test
+    void completesSelectedTaskAndReloadsData() {
+        List<Category> categories = List.of(new Category("Math"));
+        List<StudyTask> tasks = List.of();
+
+        when(view.selectedTaskId()).thenReturn(Optional.of(1L));
+        when(categoryService.findAll()).thenReturn(categories);
+        when(studyTaskService.findAll()).thenReturn(tasks);
+
+        StudyTaskManagerPresenter presenter =
+                new StudyTaskManagerPresenter(view, categoryService, studyTaskService);
+
+        presenter.completeSelectedTask();
+
+        verify(studyTaskService).markCompleted(1L);
+        verify(view).showCategories(categories);
+        verify(view).showTasks(tasks);
+    }
+
+    @Test
+    void showsErrorWhenCompletingTaskWithoutSelection() {
+        when(view.selectedTaskId()).thenReturn(Optional.empty());
+
+        StudyTaskManagerPresenter presenter =
+                new StudyTaskManagerPresenter(view, categoryService, studyTaskService);
+
+        presenter.completeSelectedTask();
+
+        verify(view).showError("Please select a task to complete.");
+        verify(studyTaskService, never()).markCompleted(org.mockito.ArgumentMatchers.anyLong());
+    }
+
 }
+

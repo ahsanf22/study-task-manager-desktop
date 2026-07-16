@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.JButton;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
 
 import org.junit.jupiter.api.Test;
 
@@ -96,6 +97,40 @@ class StudyTaskManagerPanelTest {
         });
 
         assertThat(actionExecuted).isTrue();
+    }
+
+
+    @Test
+    void executesCompleteTaskActionWhenButtonIsClicked() throws Exception {
+        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
+        AtomicBoolean actionExecuted = new AtomicBoolean(false);
+
+        SwingUtilities.invokeAndWait(() -> {
+            panel.setCompleteTaskAction(() -> actionExecuted.set(true));
+            panel.getCompleteTaskButton().doClick();
+        });
+
+        assertThat(actionExecuted).isTrue();
+    }
+
+    @Test
+    void returnsSelectedTaskId() throws Exception {
+        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
+
+        SwingUtilities.invokeAndWait(() -> {
+            DefaultTableModel model = (DefaultTableModel) panel.getTaskTable().getModel();
+            model.addRow(new Object[] { 42L, "Read Chapter 1", "Math", "HIGH", "2026-07-20", "PENDING" });
+            panel.getTaskTable().setRowSelectionInterval(0, 0);
+        });
+
+        assertThat(panel.selectedTaskId()).contains(42L);
+    }
+
+    @Test
+    void returnsEmptySelectedTaskIdWhenNoTaskIsSelected() throws Exception {
+        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
+
+        assertThat(panel.selectedTaskId()).isEmpty();
     }
 
     private StudyTaskManagerPanel createPanelOnEventDispatchThread()

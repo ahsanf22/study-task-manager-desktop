@@ -24,6 +24,7 @@ public class StudyTaskManagerPresenter {
 
         this.view.setAddCategoryAction(this::addCategory);
         this.view.setAddTaskAction(this::addTask);
+        this.view.setCompleteTaskAction(this::completeSelectedTask);
     }
 
     public void loadInitialData() {
@@ -62,6 +63,17 @@ public class StudyTaskManagerPresenter {
         }
     }
 
+    public void completeSelectedTask() {
+        try {
+            view.selectedTaskId()
+                    .ifPresentOrElse(
+                            this::markTaskCompletedAndReload,
+                            () -> view.showError("Please select a task to complete."));
+        } catch (RuntimeException exception) {
+            view.showError("Could not complete task: " + exception.getMessage());
+        }
+    }
+
     private void createCategoryAndReload(String categoryName) {
         categoryService.createCategory(categoryName);
         reloadData();
@@ -75,6 +87,11 @@ public class StudyTaskManagerPresenter {
                 task.deadline(),
                 task.categoryId());
 
+        reloadData();
+    }
+
+    private void markTaskCompletedAndReload(Long taskId) {
+        studyTaskService.markCompleted(taskId);
         reloadData();
     }
 
