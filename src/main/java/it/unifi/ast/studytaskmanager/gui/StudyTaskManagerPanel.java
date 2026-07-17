@@ -101,6 +101,16 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
     }
 
     @Override
+    public boolean confirmDeleteCategories(int categoryCount) {
+        return confirmDeletion(categoryCount, "category", "categories");
+    }
+
+    @Override
+    public boolean confirmDeleteTasks(int taskCount) {
+        return confirmDeletion(taskCount, "task", "tasks");
+    }
+
+    @Override
     public Optional<String> askForCategoryName() {
         String categoryName = JOptionPane.showInputDialog(
                 this,
@@ -227,6 +237,19 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
 
     public JButton getDeleteTaskButton() {
         return deleteTaskButton;
+    }
+
+    private boolean confirmDeletion(int itemCount, String singularName, String pluralName) {
+        String itemName = itemCount == 1 ? singularName : pluralName;
+
+        int result = JOptionPane.showConfirmDialog(
+                this,
+                "Delete " + itemCount + " " + itemName + "?",
+                "Confirm Delete",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+
+        return result == JOptionPane.YES_OPTION;
     }
 
     private JLabel createHeader() {

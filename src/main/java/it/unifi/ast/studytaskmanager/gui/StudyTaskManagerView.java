@@ -14,6 +14,10 @@ public interface StudyTaskManagerView {
 
     void showError(String message);
 
+    boolean confirmDeleteCategories(int categoryCount);
+
+    boolean confirmDeleteTasks(int taskCount);
+
     Optional<String> askForCategoryName();
 
     Optional<TaskFormData> askForTaskDetails(List<Category> categories);

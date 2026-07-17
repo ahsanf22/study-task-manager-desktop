@@ -118,6 +118,7 @@ class StudyTaskManagerPresenterTest {
         List<StudyTask> tasks = List.of();
 
         when(view.selectedCategoryIds()).thenReturn(List.of(1L, 2L));
+        when(view.confirmDeleteCategories(2)).thenReturn(true);
         when(categoryService.findAll()).thenReturn(categories);
         when(studyTaskService.findAll()).thenReturn(tasks);
 
@@ -248,6 +249,7 @@ class StudyTaskManagerPresenterTest {
         List<StudyTask> tasks = List.of();
 
         when(view.selectedTaskIds()).thenReturn(List.of(1L, 2L));
+        when(view.confirmDeleteTasks(2)).thenReturn(true);
         when(categoryService.findAll()).thenReturn(categories);
         when(studyTaskService.findAll()).thenReturn(tasks);
 
@@ -274,4 +276,32 @@ class StudyTaskManagerPresenterTest {
         verify(view).showError("Please select at least one task to delete.");
         verify(studyTaskService, never()).deleteTask(anyLong());
     }
+
+    @Test
+    void doesNotDeleteCategoriesWhenConfirmationIsRejected() {
+        when(view.selectedCategoryIds()).thenReturn(List.of(1L, 2L));
+        when(view.confirmDeleteCategories(2)).thenReturn(false);
+
+        StudyTaskManagerPresenter presenter =
+                new StudyTaskManagerPresenter(view, categoryService, studyTaskService);
+
+        presenter.deleteSelectedCategory();
+
+        verify(categoryService, never()).deleteCategory(anyLong());
+    }
+
+    @Test
+    void doesNotDeleteTasksWhenConfirmationIsRejected() {
+        when(view.selectedTaskIds()).thenReturn(List.of(1L, 2L));
+        when(view.confirmDeleteTasks(2)).thenReturn(false);
+
+        StudyTaskManagerPresenter presenter =
+                new StudyTaskManagerPresenter(view, categoryService, studyTaskService);
+
+        presenter.deleteSelectedTask();
+
+        verify(studyTaskService, never()).deleteTask(anyLong());
+    }
+
 }
+

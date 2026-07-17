@@ -57,7 +57,9 @@ public class StudyTaskManagerPresenter {
                 return;
             }
 
-            deleteCategoriesAndReload(categoryIds);
+            if (view.confirmDeleteCategories(categoryIds.size())) {
+                deleteCategoriesAndReload(categoryIds);
+            }
         } catch (RuntimeException exception) {
             view.showError("Could not delete category: " + exception.getMessage());
         }
@@ -104,7 +106,9 @@ public class StudyTaskManagerPresenter {
                 return;
             }
 
-            deleteTasksAndReload(taskIds);
+            if (view.confirmDeleteTasks(taskIds.size())) {
+                deleteTasksAndReload(taskIds);
+            }
         } catch (RuntimeException exception) {
             view.showError("Could not delete task: " + exception.getMessage());
         }
