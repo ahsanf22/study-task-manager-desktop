@@ -11,10 +11,14 @@ The project was developed for the **Automated Software Testing** course as a **6
 ## Features
 
 - Add study categories
+- Update study categories
 - Delete one or more selected categories
 - Add study tasks
+- Update study tasks
 - Complete one or more selected tasks
+- Mark one or more selected tasks as pending
 - Delete one or more selected tasks
+- Search tasks by title
 - Checkbox-based multi-selection
 - Confirmation dialogs before deleting tasks or categories
 - PostgreSQL database persistence
@@ -333,15 +337,20 @@ The application currently supports:
 ### Category Actions
 
 - Add category
+- Update selected category
 - Delete selected category
 - Delete multiple selected categories using checkboxes
 
 ### Task Actions
 
 - Add task
+- Update selected task
 - Complete selected task
 - Complete multiple selected tasks using checkboxes
+- Mark selected task as pending
+- Mark multiple selected tasks as pending using checkboxes
 - Delete selected task
+- Search tasks by title
 - Delete multiple selected tasks using checkboxes
 
 ---

@@ -22,6 +22,8 @@ public interface StudyTaskManagerView {
 
     Optional<TaskFormData> askForTaskDetails(List<Category> categories);
 
+    Optional<TaskFormData> askForTaskDetails(List<Category> categories, String dialogTitle);
+
     Optional<Long> selectedCategoryId();
 
     Optional<Long> selectedTaskId();
@@ -29,6 +31,10 @@ public interface StudyTaskManagerView {
     List<Long> selectedCategoryIds();
 
     List<Long> selectedTaskIds();
+
+    String taskSearchText();
+
+    void clearTaskSearchText();
 
     void setAddCategoryAction(Runnable action);
 
@@ -39,4 +45,14 @@ public interface StudyTaskManagerView {
     void setCompleteTaskAction(Runnable action);
 
     void setDeleteTaskAction(Runnable action);
+
+    void setUpdateCategoryAction(Runnable action);
+
+    void setUpdateTaskAction(Runnable action);
+
+    void setPendingTaskAction(Runnable action);
+
+    void setSearchTasksAction(Runnable action);
+
+    void setClearTaskSearchAction(Runnable action);
 }

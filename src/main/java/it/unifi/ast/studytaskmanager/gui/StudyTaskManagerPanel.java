@@ -33,6 +33,12 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
     public static final String ADD_TASK_BUTTON_NAME = "addTaskButton";
     public static final String COMPLETE_TASK_BUTTON_NAME = "completeTaskButton";
     public static final String DELETE_TASK_BUTTON_NAME = "deleteTaskButton";
+    public static final String UPDATE_CATEGORY_BUTTON_NAME = "updateCategoryButton";
+    public static final String UPDATE_TASK_BUTTON_NAME = "updateTaskButton";
+    public static final String PENDING_TASK_BUTTON_NAME = "pendingTaskButton";
+    public static final String TASK_SEARCH_FIELD_NAME = "taskSearchField";
+    public static final String SEARCH_TASKS_BUTTON_NAME = "searchTasksButton";
+    public static final String CLEAR_TASK_SEARCH_BUTTON_NAME = "clearTaskSearchButton";
 
     private final JTable categoryTable;
     private final JTable taskTable;
@@ -41,6 +47,12 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
     private final JButton addTaskButton;
     private final JButton completeTaskButton;
     private final JButton deleteTaskButton;
+    private final JButton updateCategoryButton;
+    private final JButton updateTaskButton;
+    private final JButton pendingTaskButton;
+    private final JTextField taskSearchField;
+    private final JButton searchTasksButton;
+    private final JButton clearTaskSearchButton;
 
     public StudyTaskManagerPanel() {
         super(new BorderLayout(10, 10));
@@ -53,10 +65,17 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
         addTaskButton = createButton("Add Task", ADD_TASK_BUTTON_NAME);
         completeTaskButton = createButton("Complete Task", COMPLETE_TASK_BUTTON_NAME);
         deleteTaskButton = createButton("Delete Task", DELETE_TASK_BUTTON_NAME);
+        updateCategoryButton = createButton("Update Category", UPDATE_CATEGORY_BUTTON_NAME);
+        updateTaskButton = createButton("Update Task", UPDATE_TASK_BUTTON_NAME);
+        pendingTaskButton = createButton("Mark Pending", PENDING_TASK_BUTTON_NAME);
+        taskSearchField = new JTextField();
+        taskSearchField.setName(TASK_SEARCH_FIELD_NAME);
+        searchTasksButton = createButton("Search Tasks", SEARCH_TASKS_BUTTON_NAME);
+        clearTaskSearchButton = createButton("Clear Search", CLEAR_TASK_SEARCH_BUTTON_NAME);
 
         add(createHeader(), BorderLayout.NORTH);
         add(createTablesPanel(), BorderLayout.CENTER);
-        add(createButtonsPanel(), BorderLayout.SOUTH);
+        add(createBottomPanel(), BorderLayout.SOUTH);
     }
 
     @Override
@@ -123,6 +142,11 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
 
     @Override
     public Optional<TaskFormData> askForTaskDetails(List<Category> categories) {
+        return askForTaskDetails(categories, "Add Task");
+    }
+
+    @Override
+    public Optional<TaskFormData> askForTaskDetails(List<Category> categories, String dialogTitle) {
         JTextField titleField = new JTextField();
         JTextField descriptionField = new JTextField();
         JTextField deadlineField = new JTextField(LocalDate.now().plusDays(7).toString());
@@ -148,7 +172,7 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
         int result = JOptionPane.showConfirmDialog(
                 this,
                 form,
-                "Add Task",
+                dialogTitle,
                 JOptionPane.OK_CANCEL_OPTION,
                 JOptionPane.PLAIN_MESSAGE);
 
@@ -187,6 +211,16 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
     }
 
     @Override
+    public String taskSearchText() {
+        return taskSearchField.getText();
+    }
+
+    @Override
+    public void clearTaskSearchText() {
+        taskSearchField.setText("");
+    }
+
+    @Override
     public void setAddCategoryAction(Runnable action) {
         addCategoryButton.addActionListener(event -> action.run());
     }
@@ -209,6 +243,31 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
     @Override
     public void setDeleteTaskAction(Runnable action) {
         deleteTaskButton.addActionListener(event -> action.run());
+    }
+
+    @Override
+    public void setUpdateCategoryAction(Runnable action) {
+        updateCategoryButton.addActionListener(event -> action.run());
+    }
+
+    @Override
+    public void setUpdateTaskAction(Runnable action) {
+        updateTaskButton.addActionListener(event -> action.run());
+    }
+
+    @Override
+    public void setPendingTaskAction(Runnable action) {
+        pendingTaskButton.addActionListener(event -> action.run());
+    }
+
+    @Override
+    public void setSearchTasksAction(Runnable action) {
+        searchTasksButton.addActionListener(event -> action.run());
+    }
+
+    @Override
+    public void setClearTaskSearchAction(Runnable action) {
+        clearTaskSearchButton.addActionListener(event -> action.run());
     }
 
     public JTable getCategoryTable() {
@@ -237,6 +296,30 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
 
     public JButton getDeleteTaskButton() {
         return deleteTaskButton;
+    }
+
+    public JButton getUpdateCategoryButton() {
+        return updateCategoryButton;
+    }
+
+    public JButton getUpdateTaskButton() {
+        return updateTaskButton;
+    }
+
+    public JButton getPendingTaskButton() {
+        return pendingTaskButton;
+    }
+
+    public JTextField getTaskSearchField() {
+        return taskSearchField;
+    }
+
+    public JButton getSearchTasksButton() {
+        return searchTasksButton;
+    }
+
+    public JButton getClearTaskSearchButton() {
+        return clearTaskSearchButton;
     }
 
     private boolean confirmDeletion(int itemCount, String singularName, String pluralName) {
@@ -269,13 +352,39 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
         return splitPane;
     }
 
+    private JPanel createBottomPanel() {
+        JPanel bottomPanel = new JPanel(new BorderLayout(0, 10));
+
+        bottomPanel.add(createTaskSearchPanel(), BorderLayout.NORTH);
+        bottomPanel.add(createButtonsPanel(), BorderLayout.CENTER);
+
+        return bottomPanel;
+    }
+
+    private JPanel createTaskSearchPanel() {
+        JPanel searchPanel = new JPanel(new BorderLayout(10, 0));
+        JPanel searchButtonsPanel = new JPanel(new GridLayout(1, 2, 10, 0));
+
+        searchButtonsPanel.add(searchTasksButton);
+        searchButtonsPanel.add(clearTaskSearchButton);
+
+        searchPanel.add(new JLabel("Task title:"), BorderLayout.WEST);
+        searchPanel.add(taskSearchField, BorderLayout.CENTER);
+        searchPanel.add(searchButtonsPanel, BorderLayout.EAST);
+
+        return searchPanel;
+    }
+
     private JPanel createButtonsPanel() {
-        JPanel buttonsPanel = new JPanel(new GridLayout(1, 5, 10, 0));
+        JPanel buttonsPanel = new JPanel(new GridLayout(2, 4, 10, 5));
 
         buttonsPanel.add(addCategoryButton);
+        buttonsPanel.add(updateCategoryButton);
         buttonsPanel.add(deleteCategoryButton);
         buttonsPanel.add(addTaskButton);
+        buttonsPanel.add(updateTaskButton);
         buttonsPanel.add(completeTaskButton);
+        buttonsPanel.add(pendingTaskButton);
         buttonsPanel.add(deleteTaskButton);
 
         return buttonsPanel;

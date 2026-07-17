@@ -32,6 +32,12 @@ class StudyTaskManagerPanelTest {
         assertButton(panel.getAddTaskButton(), "Add Task", StudyTaskManagerPanel.ADD_TASK_BUTTON_NAME);
         assertButton(panel.getCompleteTaskButton(), "Complete Task", StudyTaskManagerPanel.COMPLETE_TASK_BUTTON_NAME);
         assertButton(panel.getDeleteTaskButton(), "Delete Task", StudyTaskManagerPanel.DELETE_TASK_BUTTON_NAME);
+        assertButton(panel.getUpdateCategoryButton(), "Update Category", StudyTaskManagerPanel.UPDATE_CATEGORY_BUTTON_NAME);
+        assertButton(panel.getUpdateTaskButton(), "Update Task", StudyTaskManagerPanel.UPDATE_TASK_BUTTON_NAME);
+        assertButton(panel.getPendingTaskButton(), "Mark Pending", StudyTaskManagerPanel.PENDING_TASK_BUTTON_NAME);
+        assertButton(panel.getSearchTasksButton(), "Search Tasks", StudyTaskManagerPanel.SEARCH_TASKS_BUTTON_NAME);
+        assertButton(panel.getClearTaskSearchButton(), "Clear Search", StudyTaskManagerPanel.CLEAR_TASK_SEARCH_BUTTON_NAME);
+        assertThat(panel.getTaskSearchField().getName()).isEqualTo(StudyTaskManagerPanel.TASK_SEARCH_FIELD_NAME);
     }
 
     @Test
@@ -145,6 +151,84 @@ class StudyTaskManagerPanelTest {
         assertThat(actionExecuted).isTrue();
     }
 
+
+    @Test
+    void executesUpdateCategoryActionWhenButtonIsClicked() throws Exception {
+        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
+        AtomicBoolean actionExecuted = new AtomicBoolean(false);
+
+        SwingUtilities.invokeAndWait(() -> {
+            panel.setUpdateCategoryAction(() -> actionExecuted.set(true));
+            panel.getUpdateCategoryButton().doClick();
+        });
+
+        assertThat(actionExecuted).isTrue();
+    }
+
+    @Test
+    void executesUpdateTaskActionWhenButtonIsClicked() throws Exception {
+        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
+        AtomicBoolean actionExecuted = new AtomicBoolean(false);
+
+        SwingUtilities.invokeAndWait(() -> {
+            panel.setUpdateTaskAction(() -> actionExecuted.set(true));
+            panel.getUpdateTaskButton().doClick();
+        });
+
+        assertThat(actionExecuted).isTrue();
+    }
+
+    @Test
+    void executesPendingTaskActionWhenButtonIsClicked() throws Exception {
+        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
+        AtomicBoolean actionExecuted = new AtomicBoolean(false);
+
+        SwingUtilities.invokeAndWait(() -> {
+            panel.setPendingTaskAction(() -> actionExecuted.set(true));
+            panel.getPendingTaskButton().doClick();
+        });
+
+        assertThat(actionExecuted).isTrue();
+    }
+
+    @Test
+    void executesSearchTasksActionWhenButtonIsClicked() throws Exception {
+        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
+        AtomicBoolean actionExecuted = new AtomicBoolean(false);
+
+        SwingUtilities.invokeAndWait(() -> {
+            panel.setSearchTasksAction(() -> actionExecuted.set(true));
+            panel.getSearchTasksButton().doClick();
+        });
+
+        assertThat(actionExecuted).isTrue();
+    }
+
+    @Test
+    void executesClearTaskSearchActionWhenButtonIsClicked() throws Exception {
+        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
+        AtomicBoolean actionExecuted = new AtomicBoolean(false);
+
+        SwingUtilities.invokeAndWait(() -> {
+            panel.setClearTaskSearchAction(() -> actionExecuted.set(true));
+            panel.getClearTaskSearchButton().doClick();
+        });
+
+        assertThat(actionExecuted).isTrue();
+    }
+
+    @Test
+    void returnsAndClearsTaskSearchText() throws Exception {
+        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
+
+        SwingUtilities.invokeAndWait(() -> panel.getTaskSearchField().setText("algebra"));
+
+        assertThat(panel.taskSearchText()).isEqualTo("algebra");
+
+        SwingUtilities.invokeAndWait(panel::clearTaskSearchText);
+
+        assertThat(panel.getTaskSearchField().getText()).isEmpty();
+    }
 
 
     @Test
