@@ -123,6 +123,33 @@ class CategoryServiceTest {
         verify(categoryRepository, never()).save(category);
     }
 
+
+    @Test
+    void rejectsUpdatingMissingCategory() {
+        when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> categoryService.updateCategory(1L, "Physics"))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Category not found with id: 1");
+
+        verify(categoryRepository, never()).save(argThat(category -> "Physics".equals(category.getName())));
+    }
+
+    @Test
+    void updatesCategoryWhenNameBelongsToSameCategory() {
+        Category category = new Category("Math");
+        category.setId(1L);
+
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+        when(categoryRepository.findByName("Math")).thenReturn(Optional.of(category));
+        when(categoryRepository.save(category)).thenReturn(category);
+
+        Category updatedCategory = categoryService.updateCategory(1L, "Math");
+
+        assertThat(updatedCategory.getName()).isEqualTo("Math");
+        verify(categoryRepository).save(category);
+    }
+
     @Test
     void deletesCategoryWhenItExistsAndIsNotUsed() {
         when(categoryRepository.existsById(1L)).thenReturn(true);
