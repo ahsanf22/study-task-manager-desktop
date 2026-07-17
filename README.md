@@ -104,9 +104,15 @@ src/main/java/it/unifi/ast/studytaskmanager
 │   ├── CategoryService.java
 │   └── StudyTaskService.java
 ├── transaction
-│   ├── ImmediateTransactionManager.java
 │   └── TransactionManager.java
 └── StudyTaskManagerApp.java
+```
+
+Test helper classes are located under `src/test/java`, including:
+
+```text
+src/test/java/it/unifi/ast/studytaskmanager/transaction
+└── ImmediateTransactionManager.java
 ```
 
 ---
@@ -376,6 +382,24 @@ The generated JAR is available in:
 
 ```text
 target/study-task-manager-desktop-1.0.0-SNAPSHOT.jar
+```
+
+---
+
+## Mutation Testing
+
+The project includes PIT mutation testing configuration for the service layer.
+
+Run mutation testing with:
+
+```bash
+mvn org.pitest:pitest-maven:mutationCoverage
+```
+
+The PIT report is generated in:
+
+```text
+target/pit-reports/index.html
 ```
 
 ---
