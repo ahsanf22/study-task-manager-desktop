@@ -263,6 +263,7 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
 
         JTable table = new JTable(model);
         table.setName(CATEGORY_TABLE_NAME);
+        configureCheckboxSelectionOnly(table);
 
         return table;
     }
@@ -279,8 +280,16 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
 
         JTable table = new JTable(model);
         table.setName(TASK_TABLE_NAME);
+        configureCheckboxSelectionOnly(table);
 
         return table;
+    }
+
+    private void configureCheckboxSelectionOnly(JTable table) {
+        table.setRowSelectionAllowed(false);
+        table.setColumnSelectionAllowed(false);
+        table.setCellSelectionEnabled(false);
+        table.setFocusable(false);
     }
 
     private JButton createButton(String text, String name) {
@@ -314,10 +323,6 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
             if (Boolean.TRUE.equals(selectedValue)) {
                 ids.add(idAt(table, modelRow, idColumnIndex));
             }
-        }
-
-        if (ids.isEmpty()) {
-            selectedRowId(table, idColumnIndex).ifPresent(ids::add);
         }
 
         return ids;

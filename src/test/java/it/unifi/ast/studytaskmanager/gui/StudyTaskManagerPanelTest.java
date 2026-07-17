@@ -35,7 +35,7 @@ class StudyTaskManagerPanelTest {
     }
 
     @Test
-    void createsEditableSelectionColumnAndNonEditableDataColumns() throws Exception {
+    void createsEditableSelectionColumnAndNonEditableDataColumnsWithoutRowHighlight() throws Exception {
         StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
 
         JTable categoryTable = panel.getCategoryTable();
@@ -43,9 +43,11 @@ class StudyTaskManagerPanelTest {
 
         assertThat(categoryTable.isCellEditable(0, 0)).isTrue();
         assertThat(categoryTable.isCellEditable(0, 1)).isFalse();
+        assertThat(categoryTable.getRowSelectionAllowed()).isFalse();
 
         assertThat(taskTable.isCellEditable(0, 0)).isTrue();
         assertThat(taskTable.isCellEditable(0, 1)).isFalse();
+        assertThat(taskTable.getRowSelectionAllowed()).isFalse();
     }
 
     @Test
@@ -143,31 +145,7 @@ class StudyTaskManagerPanelTest {
         assertThat(actionExecuted).isTrue();
     }
 
-    @Test
-    void returnsSelectedCategoryIdFromSelectedRow() throws Exception {
-        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
 
-        SwingUtilities.invokeAndWait(() -> {
-            DefaultTableModel model = (DefaultTableModel) panel.getCategoryTable().getModel();
-            model.addRow(new Object[] { Boolean.FALSE, 99L, "Math" });
-            panel.getCategoryTable().setRowSelectionInterval(0, 0);
-        });
-
-        assertThat(panel.selectedCategoryId()).contains(99L);
-    }
-
-    @Test
-    void returnsSelectedTaskIdFromSelectedRow() throws Exception {
-        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
-
-        SwingUtilities.invokeAndWait(() -> {
-            DefaultTableModel model = (DefaultTableModel) panel.getTaskTable().getModel();
-            model.addRow(new Object[] { Boolean.FALSE, 42L, "Read Chapter 1", "Math", "HIGH", "2026-07-20", "PENDING" });
-            panel.getTaskTable().setRowSelectionInterval(0, 0);
-        });
-
-        assertThat(panel.selectedTaskId()).contains(42L);
-    }
 
     @Test
     void returnsCheckedCategoryIds() throws Exception {
