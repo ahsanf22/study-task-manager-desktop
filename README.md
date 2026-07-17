@@ -1,6 +1,10 @@
 # Study Task Manager Desktop
 
 [![Maven CI](https://github.com/ahsanf22/study-task-manager-desktop/actions/workflows/maven.yml/badge.svg)](https://github.com/ahsanf22/study-task-manager-desktop/actions/workflows/maven.yml)
+[![Coverage Status](https://coveralls.io/repos/github/ahsanf22/study-task-manager-desktop/badge.svg?branch=master)](https://coveralls.io/github/ahsanf22/study-task-manager-desktop?branch=master)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ahsanf22_study-task-manager-desktop&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=ahsanf22_study-task-manager-desktop)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ahsanf22_study-task-manager-desktop&metric=coverage)](https://sonarcloud.io/summary/new_code?id=ahsanf22_study-task-manager-desktop)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=ahsanf22_study-task-manager-desktop&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=ahsanf22_study-task-manager-desktop)
 
 Study Task Manager Desktop is a Java Swing desktop application for managing study categories and study tasks.
 
