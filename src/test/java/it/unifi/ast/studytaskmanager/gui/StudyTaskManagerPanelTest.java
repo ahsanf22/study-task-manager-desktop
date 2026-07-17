@@ -28,38 +28,44 @@ class StudyTaskManagerPanelTest {
                 .isEqualTo(StudyTaskManagerPanel.TASK_TABLE_NAME);
 
         assertButton(panel.getAddCategoryButton(), "Add Category", StudyTaskManagerPanel.ADD_CATEGORY_BUTTON_NAME);
+        assertButton(panel.getDeleteCategoryButton(), "Delete Category", StudyTaskManagerPanel.DELETE_CATEGORY_BUTTON_NAME);
         assertButton(panel.getAddTaskButton(), "Add Task", StudyTaskManagerPanel.ADD_TASK_BUTTON_NAME);
         assertButton(panel.getCompleteTaskButton(), "Complete Task", StudyTaskManagerPanel.COMPLETE_TASK_BUTTON_NAME);
         assertButton(panel.getDeleteTaskButton(), "Delete Task", StudyTaskManagerPanel.DELETE_TASK_BUTTON_NAME);
     }
 
     @Test
-    void createsNonEditableTables() throws Exception {
+    void createsEditableSelectionColumnAndNonEditableDataColumns() throws Exception {
         StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
 
         JTable categoryTable = panel.getCategoryTable();
         JTable taskTable = panel.getTaskTable();
 
-        assertThat(categoryTable.isCellEditable(0, 0)).isFalse();
-        assertThat(taskTable.isCellEditable(0, 0)).isFalse();
+        assertThat(categoryTable.isCellEditable(0, 0)).isTrue();
+        assertThat(categoryTable.isCellEditable(0, 1)).isFalse();
+
+        assertThat(taskTable.isCellEditable(0, 0)).isTrue();
+        assertThat(taskTable.isCellEditable(0, 1)).isFalse();
     }
 
     @Test
     void createsExpectedTableColumns() throws Exception {
         StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
 
-        assertThat(panel.getCategoryTable().getColumnCount()).isEqualTo(2);
-        assertThat(panel.getTaskTable().getColumnCount()).isEqualTo(6);
+        assertThat(panel.getCategoryTable().getColumnCount()).isEqualTo(3);
+        assertThat(panel.getTaskTable().getColumnCount()).isEqualTo(7);
 
-        assertThat(panel.getCategoryTable().getColumnName(0)).isEqualTo("ID");
-        assertThat(panel.getCategoryTable().getColumnName(1)).isEqualTo("Name");
+        assertThat(panel.getCategoryTable().getColumnName(0)).isEqualTo("Select");
+        assertThat(panel.getCategoryTable().getColumnName(1)).isEqualTo("ID");
+        assertThat(panel.getCategoryTable().getColumnName(2)).isEqualTo("Name");
 
-        assertThat(panel.getTaskTable().getColumnName(0)).isEqualTo("ID");
-        assertThat(panel.getTaskTable().getColumnName(1)).isEqualTo("Title");
-        assertThat(panel.getTaskTable().getColumnName(2)).isEqualTo("Category");
-        assertThat(panel.getTaskTable().getColumnName(3)).isEqualTo("Priority");
-        assertThat(panel.getTaskTable().getColumnName(4)).isEqualTo("Deadline");
-        assertThat(panel.getTaskTable().getColumnName(5)).isEqualTo("Status");
+        assertThat(panel.getTaskTable().getColumnName(0)).isEqualTo("Select");
+        assertThat(panel.getTaskTable().getColumnName(1)).isEqualTo("ID");
+        assertThat(panel.getTaskTable().getColumnName(2)).isEqualTo("Title");
+        assertThat(panel.getTaskTable().getColumnName(3)).isEqualTo("Category");
+        assertThat(panel.getTaskTable().getColumnName(4)).isEqualTo("Priority");
+        assertThat(panel.getTaskTable().getColumnName(5)).isEqualTo("Deadline");
+        assertThat(panel.getTaskTable().getColumnName(6)).isEqualTo("Status");
     }
 
     @Test
@@ -69,7 +75,7 @@ class StudyTaskManagerPanelTest {
         SwingUtilities.invokeAndWait(() -> panel.showCategories(List.of(new Category("Math"))));
 
         assertThat(panel.getCategoryTable().getRowCount()).isEqualTo(1);
-        assertThat(panel.getCategoryTable().getValueAt(0, 1)).isEqualTo("Math");
+        assertThat(panel.getCategoryTable().getValueAt(0, 2)).isEqualTo("Math");
     }
 
     @Test
@@ -85,6 +91,18 @@ class StudyTaskManagerPanelTest {
         assertThat(actionExecuted).isTrue();
     }
 
+    @Test
+    void executesDeleteCategoryActionWhenButtonIsClicked() throws Exception {
+        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
+        AtomicBoolean actionExecuted = new AtomicBoolean(false);
+
+        SwingUtilities.invokeAndWait(() -> {
+            panel.setDeleteCategoryAction(() -> actionExecuted.set(true));
+            panel.getDeleteCategoryButton().doClick();
+        });
+
+        assertThat(actionExecuted).isTrue();
+    }
 
     @Test
     void executesAddTaskActionWhenButtonIsClicked() throws Exception {
@@ -98,7 +116,6 @@ class StudyTaskManagerPanelTest {
 
         assertThat(actionExecuted).isTrue();
     }
-
 
     @Test
     void executesCompleteTaskActionWhenButtonIsClicked() throws Exception {
@@ -114,27 +131,6 @@ class StudyTaskManagerPanelTest {
     }
 
     @Test
-    void returnsSelectedTaskId() throws Exception {
-        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
-
-        SwingUtilities.invokeAndWait(() -> {
-            DefaultTableModel model = (DefaultTableModel) panel.getTaskTable().getModel();
-            model.addRow(new Object[] { 42L, "Read Chapter 1", "Math", "HIGH", "2026-07-20", "PENDING" });
-            panel.getTaskTable().setRowSelectionInterval(0, 0);
-        });
-
-        assertThat(panel.selectedTaskId()).contains(42L);
-    }
-
-    @Test
-    void returnsEmptySelectedTaskIdWhenNoTaskIsSelected() throws Exception {
-        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
-
-        assertThat(panel.selectedTaskId()).isEmpty();
-    }
-
-
-    @Test
     void executesDeleteTaskActionWhenButtonIsClicked() throws Exception {
         StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
         AtomicBoolean actionExecuted = new AtomicBoolean(false);
@@ -147,27 +143,13 @@ class StudyTaskManagerPanelTest {
         assertThat(actionExecuted).isTrue();
     }
 
-
     @Test
-    void executesDeleteCategoryActionWhenButtonIsClicked() throws Exception {
-        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
-        AtomicBoolean actionExecuted = new AtomicBoolean(false);
-
-        SwingUtilities.invokeAndWait(() -> {
-            panel.setDeleteCategoryAction(() -> actionExecuted.set(true));
-            panel.getDeleteCategoryButton().doClick();
-        });
-
-        assertThat(actionExecuted).isTrue();
-    }
-
-    @Test
-    void returnsSelectedCategoryId() throws Exception {
+    void returnsSelectedCategoryIdFromSelectedRow() throws Exception {
         StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
 
         SwingUtilities.invokeAndWait(() -> {
             DefaultTableModel model = (DefaultTableModel) panel.getCategoryTable().getModel();
-            model.addRow(new Object[] { 99L, "Math" });
+            model.addRow(new Object[] { Boolean.FALSE, 99L, "Math" });
             panel.getCategoryTable().setRowSelectionInterval(0, 0);
         });
 
@@ -175,10 +157,58 @@ class StudyTaskManagerPanelTest {
     }
 
     @Test
+    void returnsSelectedTaskIdFromSelectedRow() throws Exception {
+        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
+
+        SwingUtilities.invokeAndWait(() -> {
+            DefaultTableModel model = (DefaultTableModel) panel.getTaskTable().getModel();
+            model.addRow(new Object[] { Boolean.FALSE, 42L, "Read Chapter 1", "Math", "HIGH", "2026-07-20", "PENDING" });
+            panel.getTaskTable().setRowSelectionInterval(0, 0);
+        });
+
+        assertThat(panel.selectedTaskId()).contains(42L);
+    }
+
+    @Test
+    void returnsCheckedCategoryIds() throws Exception {
+        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
+
+        SwingUtilities.invokeAndWait(() -> {
+            DefaultTableModel model = (DefaultTableModel) panel.getCategoryTable().getModel();
+            model.addRow(new Object[] { Boolean.TRUE, 1L, "Math" });
+            model.addRow(new Object[] { Boolean.FALSE, 2L, "Science" });
+            model.addRow(new Object[] { Boolean.TRUE, 3L, "English" });
+        });
+
+        assertThat(panel.selectedCategoryIds()).containsExactly(1L, 3L);
+    }
+
+    @Test
+    void returnsCheckedTaskIds() throws Exception {
+        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
+
+        SwingUtilities.invokeAndWait(() -> {
+            DefaultTableModel model = (DefaultTableModel) panel.getTaskTable().getModel();
+            model.addRow(new Object[] { Boolean.TRUE, 1L, "Task 1", "Math", "HIGH", "2026-07-20", "PENDING" });
+            model.addRow(new Object[] { Boolean.FALSE, 2L, "Task 2", "Math", "LOW", "2026-07-21", "PENDING" });
+            model.addRow(new Object[] { Boolean.TRUE, 3L, "Task 3", "Math", "MEDIUM", "2026-07-22", "PENDING" });
+        });
+
+        assertThat(panel.selectedTaskIds()).containsExactly(1L, 3L);
+    }
+
+    @Test
     void returnsEmptySelectedCategoryIdWhenNoCategoryIsSelected() throws Exception {
         StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
 
         assertThat(panel.selectedCategoryId()).isEmpty();
+    }
+
+    @Test
+    void returnsEmptySelectedTaskIdWhenNoTaskIsSelected() throws Exception {
+        StudyTaskManagerPanel panel = createPanelOnEventDispatchThread();
+
+        assertThat(panel.selectedTaskId()).isEmpty();
     }
 
     private StudyTaskManagerPanel createPanelOnEventDispatchThread()

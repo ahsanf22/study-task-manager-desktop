@@ -22,6 +22,10 @@ public interface StudyTaskManagerView {
 
     Optional<Long> selectedTaskId();
 
+    List<Long> selectedCategoryIds();
+
+    List<Long> selectedTaskIds();
+
     void setAddCategoryAction(Runnable action);
 
     void setDeleteCategoryAction(Runnable action);

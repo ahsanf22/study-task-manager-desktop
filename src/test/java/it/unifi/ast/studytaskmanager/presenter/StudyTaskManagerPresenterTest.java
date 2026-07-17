@@ -1,5 +1,7 @@
 package it.unifi.ast.studytaskmanager.presenter;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -111,6 +113,39 @@ class StudyTaskManagerPresenterTest {
     }
 
     @Test
+    void deletesSelectedCategoriesAndReloadsData() {
+        List<Category> categories = List.of();
+        List<StudyTask> tasks = List.of();
+
+        when(view.selectedCategoryIds()).thenReturn(List.of(1L, 2L));
+        when(categoryService.findAll()).thenReturn(categories);
+        when(studyTaskService.findAll()).thenReturn(tasks);
+
+        StudyTaskManagerPresenter presenter =
+                new StudyTaskManagerPresenter(view, categoryService, studyTaskService);
+
+        presenter.deleteSelectedCategory();
+
+        verify(categoryService).deleteCategory(1L);
+        verify(categoryService).deleteCategory(2L);
+        verify(view).showCategories(categories);
+        verify(view).showTasks(tasks);
+    }
+
+    @Test
+    void showsErrorWhenDeletingCategoryWithoutSelection() {
+        when(view.selectedCategoryIds()).thenReturn(List.of());
+
+        StudyTaskManagerPresenter presenter =
+                new StudyTaskManagerPresenter(view, categoryService, studyTaskService);
+
+        presenter.deleteSelectedCategory();
+
+        verify(view).showError("Please select at least one category to delete.");
+        verify(categoryService, never()).deleteCategory(anyLong());
+    }
+
+    @Test
     void addsTaskAndReloadsData() {
         Category category = new Category("Math");
         List<Category> categories = List.of(category);
@@ -169,17 +204,17 @@ class StudyTaskManagerPresenterTest {
         verify(studyTaskService, never()).createTask(
                 anyString(),
                 anyString(),
-                org.mockito.ArgumentMatchers.any(),
-                org.mockito.ArgumentMatchers.any(),
-                org.mockito.ArgumentMatchers.anyLong());
+                any(),
+                any(),
+                anyLong());
     }
 
     @Test
-    void completesSelectedTaskAndReloadsData() {
+    void completesSelectedTasksAndReloadsData() {
         List<Category> categories = List.of(new Category("Math"));
         List<StudyTask> tasks = List.of();
 
-        when(view.selectedTaskId()).thenReturn(Optional.of(1L));
+        when(view.selectedTaskIds()).thenReturn(List.of(1L, 2L));
         when(categoryService.findAll()).thenReturn(categories);
         when(studyTaskService.findAll()).thenReturn(tasks);
 
@@ -189,30 +224,30 @@ class StudyTaskManagerPresenterTest {
         presenter.completeSelectedTask();
 
         verify(studyTaskService).markCompleted(1L);
+        verify(studyTaskService).markCompleted(2L);
         verify(view).showCategories(categories);
         verify(view).showTasks(tasks);
     }
 
     @Test
     void showsErrorWhenCompletingTaskWithoutSelection() {
-        when(view.selectedTaskId()).thenReturn(Optional.empty());
+        when(view.selectedTaskIds()).thenReturn(List.of());
 
         StudyTaskManagerPresenter presenter =
                 new StudyTaskManagerPresenter(view, categoryService, studyTaskService);
 
         presenter.completeSelectedTask();
 
-        verify(view).showError("Please select a task to complete.");
-        verify(studyTaskService, never()).markCompleted(org.mockito.ArgumentMatchers.anyLong());
+        verify(view).showError("Please select at least one task to complete.");
+        verify(studyTaskService, never()).markCompleted(anyLong());
     }
 
-
     @Test
-    void deletesSelectedTaskAndReloadsData() {
+    void deletesSelectedTasksAndReloadsData() {
         List<Category> categories = List.of(new Category("Math"));
         List<StudyTask> tasks = List.of();
 
-        when(view.selectedTaskId()).thenReturn(Optional.of(1L));
+        when(view.selectedTaskIds()).thenReturn(List.of(1L, 2L));
         when(categoryService.findAll()).thenReturn(categories);
         when(studyTaskService.findAll()).thenReturn(tasks);
 
@@ -222,57 +257,21 @@ class StudyTaskManagerPresenterTest {
         presenter.deleteSelectedTask();
 
         verify(studyTaskService).deleteTask(1L);
+        verify(studyTaskService).deleteTask(2L);
         verify(view).showCategories(categories);
         verify(view).showTasks(tasks);
     }
 
     @Test
     void showsErrorWhenDeletingTaskWithoutSelection() {
-        when(view.selectedTaskId()).thenReturn(Optional.empty());
+        when(view.selectedTaskIds()).thenReturn(List.of());
 
         StudyTaskManagerPresenter presenter =
                 new StudyTaskManagerPresenter(view, categoryService, studyTaskService);
 
         presenter.deleteSelectedTask();
 
-        verify(view).showError("Please select a task to delete.");
-        verify(studyTaskService, never()).deleteTask(org.mockito.ArgumentMatchers.anyLong());
+        verify(view).showError("Please select at least one task to delete.");
+        verify(studyTaskService, never()).deleteTask(anyLong());
     }
-
-
-    @Test
-    void deletesSelectedCategoryAndReloadsData() {
-        List<Category> categories = List.of();
-        List<StudyTask> tasks = List.of();
-
-        when(view.selectedCategoryId()).thenReturn(Optional.of(1L));
-        when(categoryService.findAll()).thenReturn(categories);
-        when(studyTaskService.findAll()).thenReturn(tasks);
-
-        StudyTaskManagerPresenter presenter =
-                new StudyTaskManagerPresenter(view, categoryService, studyTaskService);
-
-        presenter.deleteSelectedCategory();
-
-        verify(categoryService).deleteCategory(1L);
-        verify(view).showCategories(categories);
-        verify(view).showTasks(tasks);
-    }
-
-    @Test
-    void showsErrorWhenDeletingCategoryWithoutSelection() {
-        when(view.selectedCategoryId()).thenReturn(Optional.empty());
-
-        StudyTaskManagerPresenter presenter =
-                new StudyTaskManagerPresenter(view, categoryService, studyTaskService);
-
-        presenter.deleteSelectedCategory();
-
-        verify(view).showError("Please select a category to delete.");
-        verify(categoryService, never()).deleteCategory(org.mockito.ArgumentMatchers.anyLong());
-    }
-
 }
-
-
-

@@ -50,10 +50,14 @@ public class StudyTaskManagerPresenter {
 
     public void deleteSelectedCategory() {
         try {
-            view.selectedCategoryId()
-                    .ifPresentOrElse(
-                            this::deleteCategoryAndReload,
-                            () -> view.showError("Please select a category to delete."));
+            List<Long> categoryIds = view.selectedCategoryIds();
+
+            if (categoryIds.isEmpty()) {
+                view.showError("Please select at least one category to delete.");
+                return;
+            }
+
+            deleteCategoriesAndReload(categoryIds);
         } catch (RuntimeException exception) {
             view.showError("Could not delete category: " + exception.getMessage());
         }
@@ -78,10 +82,14 @@ public class StudyTaskManagerPresenter {
 
     public void completeSelectedTask() {
         try {
-            view.selectedTaskId()
-                    .ifPresentOrElse(
-                            this::markTaskCompletedAndReload,
-                            () -> view.showError("Please select a task to complete."));
+            List<Long> taskIds = view.selectedTaskIds();
+
+            if (taskIds.isEmpty()) {
+                view.showError("Please select at least one task to complete.");
+                return;
+            }
+
+            markTasksCompletedAndReload(taskIds);
         } catch (RuntimeException exception) {
             view.showError("Could not complete task: " + exception.getMessage());
         }
@@ -89,10 +97,14 @@ public class StudyTaskManagerPresenter {
 
     public void deleteSelectedTask() {
         try {
-            view.selectedTaskId()
-                    .ifPresentOrElse(
-                            this::deleteTaskAndReload,
-                            () -> view.showError("Please select a task to delete."));
+            List<Long> taskIds = view.selectedTaskIds();
+
+            if (taskIds.isEmpty()) {
+                view.showError("Please select at least one task to delete.");
+                return;
+            }
+
+            deleteTasksAndReload(taskIds);
         } catch (RuntimeException exception) {
             view.showError("Could not delete task: " + exception.getMessage());
         }
@@ -103,8 +115,11 @@ public class StudyTaskManagerPresenter {
         reloadData();
     }
 
-    private void deleteCategoryAndReload(Long categoryId) {
-        categoryService.deleteCategory(categoryId);
+    private void deleteCategoriesAndReload(List<Long> categoryIds) {
+        for (Long categoryId : categoryIds) {
+            categoryService.deleteCategory(categoryId);
+        }
+
         reloadData();
     }
 
@@ -119,13 +134,19 @@ public class StudyTaskManagerPresenter {
         reloadData();
     }
 
-    private void markTaskCompletedAndReload(Long taskId) {
-        studyTaskService.markCompleted(taskId);
+    private void markTasksCompletedAndReload(List<Long> taskIds) {
+        for (Long taskId : taskIds) {
+            studyTaskService.markCompleted(taskId);
+        }
+
         reloadData();
     }
 
-    private void deleteTaskAndReload(Long taskId) {
-        studyTaskService.deleteTask(taskId);
+    private void deleteTasksAndReload(List<Long> taskIds) {
+        for (Long taskId : taskIds) {
+            studyTaskService.deleteTask(taskId);
+        }
+
         reloadData();
     }
 

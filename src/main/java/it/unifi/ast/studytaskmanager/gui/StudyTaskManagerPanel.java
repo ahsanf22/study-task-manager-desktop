@@ -3,6 +3,7 @@ package it.unifi.ast.studytaskmanager.gui;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,6 +66,7 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
 
         for (Category category : categories) {
             model.addRow(new Object[] {
+                    Boolean.FALSE,
                     category.getId(),
                     category.getName()
             });
@@ -78,6 +80,7 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
 
         for (StudyTask task : tasks) {
             model.addRow(new Object[] {
+                    Boolean.FALSE,
                     task.getId(),
                     task.getTitle(),
                     categoryName(task),
@@ -155,54 +158,22 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
 
     @Override
     public Optional<Long> selectedCategoryId() {
-        int selectedRow = categoryTable.getSelectedRow();
-
-        if (selectedRow < 0) {
-            return Optional.empty();
-        }
-
-        int modelRow = categoryTable.convertRowIndexToModel(selectedRow);
-        Object idValue = categoryTable.getModel().getValueAt(modelRow, 0);
-
-        if (idValue == null) {
-            return Optional.empty();
-        }
-
-        if (idValue instanceof Long id) {
-            return Optional.of(id);
-        }
-
-        if (idValue instanceof Number number) {
-            return Optional.of(number.longValue());
-        }
-
-        return Optional.of(Long.valueOf(idValue.toString()));
+        return selectedRowId(categoryTable, 1);
     }
 
     @Override
     public Optional<Long> selectedTaskId() {
-        int selectedRow = taskTable.getSelectedRow();
+        return selectedRowId(taskTable, 1);
+    }
 
-        if (selectedRow < 0) {
-            return Optional.empty();
-        }
+    @Override
+    public List<Long> selectedCategoryIds() {
+        return selectedIds(categoryTable, 1);
+    }
 
-        int modelRow = taskTable.convertRowIndexToModel(selectedRow);
-        Object idValue = taskTable.getModel().getValueAt(modelRow, 0);
-
-        if (idValue == null) {
-            return Optional.empty();
-        }
-
-        if (idValue instanceof Long id) {
-            return Optional.of(id);
-        }
-
-        if (idValue instanceof Number number) {
-            return Optional.of(number.longValue());
-        }
-
-        return Optional.of(Long.valueOf(idValue.toString()));
+    @Override
+    public List<Long> selectedTaskIds() {
+        return selectedIds(taskTable, 1);
     }
 
     @Override
@@ -288,7 +259,7 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
     }
 
     private JTable createCategoryTable() {
-        NonEditableTableModel model = new NonEditableTableModel("ID", "Name");
+        SelectableTableModel model = new SelectableTableModel("Select", "ID", "Name");
 
         JTable table = new JTable(model);
         table.setName(CATEGORY_TABLE_NAME);
@@ -297,7 +268,8 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
     }
 
     private JTable createTaskTable() {
-        NonEditableTableModel model = new NonEditableTableModel(
+        SelectableTableModel model = new SelectableTableModel(
+                "Select",
                 "ID",
                 "Title",
                 "Category",
@@ -330,6 +302,61 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
         return task.getCategory().getName();
     }
 
+    private List<Long> selectedIds(JTable table, int idColumnIndex) {
+        stopTableEditing(table);
+
+        List<Long> ids = new ArrayList<>();
+
+        for (int row = 0; row < table.getRowCount(); row++) {
+            int modelRow = table.convertRowIndexToModel(row);
+            Object selectedValue = table.getModel().getValueAt(modelRow, 0);
+
+            if (Boolean.TRUE.equals(selectedValue)) {
+                ids.add(idAt(table, modelRow, idColumnIndex));
+            }
+        }
+
+        if (ids.isEmpty()) {
+            selectedRowId(table, idColumnIndex).ifPresent(ids::add);
+        }
+
+        return ids;
+    }
+
+    private Optional<Long> selectedRowId(JTable table, int idColumnIndex) {
+        stopTableEditing(table);
+
+        int selectedRow = table.getSelectedRow();
+
+        if (selectedRow < 0) {
+            return Optional.empty();
+        }
+
+        int modelRow = table.convertRowIndexToModel(selectedRow);
+
+        return Optional.of(idAt(table, modelRow, idColumnIndex));
+    }
+
+    private Long idAt(JTable table, int modelRow, int idColumnIndex) {
+        Object idValue = table.getModel().getValueAt(modelRow, idColumnIndex);
+
+        if (idValue instanceof Long id) {
+            return id;
+        }
+
+        if (idValue instanceof Number number) {
+            return number.longValue();
+        }
+
+        return Long.valueOf(idValue.toString());
+    }
+
+    private void stopTableEditing(JTable table) {
+        if (table.isEditing()) {
+            table.getCellEditor().stopCellEditing();
+        }
+    }
+
     private record CategoryItem(Long id, String name) {
 
         @Override
@@ -338,17 +365,26 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
         }
     }
 
-    private static final class NonEditableTableModel extends DefaultTableModel {
+    private static final class SelectableTableModel extends DefaultTableModel {
 
         private static final long serialVersionUID = 1L;
 
-        NonEditableTableModel(String... columnNames) {
+        SelectableTableModel(String... columnNames) {
             super(columnNames, 0);
         }
 
         @Override
         public boolean isCellEditable(int row, int column) {
-            return false;
+            return column == 0;
+        }
+
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            if (columnIndex == 0) {
+                return Boolean.class;
+            }
+
+            return Object.class;
         }
     }
 }
