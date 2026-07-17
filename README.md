@@ -1,5 +1,7 @@
 # Study Task Manager Desktop
 
+[![Maven CI](https://github.com/ahsanf22/study-task-manager-desktop/actions/workflows/maven.yml/badge.svg)](https://github.com/ahsanf22/study-task-manager-desktop/actions/workflows/maven.yml)
+
 Study Task Manager Desktop is a Java Swing desktop application for managing study categories and study tasks.
 
 The project was developed for the **Automated Software Testing** course as a **6-credit Java desktop application**. It follows a layered architecture and includes PostgreSQL persistence, JPA/Hibernate, transaction management, Docker/Testcontainers integration testing, and automated tests.
