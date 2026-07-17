@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 import java.util.Optional;
 
@@ -93,7 +94,7 @@ class StudyTaskManagerPresenterAdditionalCoverageTest {
                 "   ",
                 "Description",
                 Priority.HIGH,
-                LocalDate.of(2026, 7, 20),
+                LocalDate.of(2026, Month.JULY, 20),
                 1L);
 
         when(categoryService.findAll()).thenReturn(categories);
@@ -116,7 +117,7 @@ class StudyTaskManagerPresenterAdditionalCoverageTest {
                 "   ",
                 "Description",
                 Priority.HIGH,
-                LocalDate.of(2026, 7, 20),
+                LocalDate.of(2026, Month.JULY, 20),
                 1L);
 
         when(view.selectedTaskIds()).thenReturn(List.of(1L));
@@ -141,7 +142,7 @@ class StudyTaskManagerPresenterAdditionalCoverageTest {
                 "Study algebra",
                 "Description",
                 Priority.HIGH,
-                LocalDate.of(2026, 7, 20),
+                LocalDate.of(2026, Month.JULY, 20),
                 1L);
 
         when(view.selectedTaskIds()).thenReturn(List.of(1L));
@@ -152,7 +153,7 @@ class StudyTaskManagerPresenterAdditionalCoverageTest {
                 "Study algebra",
                 "Description",
                 Priority.HIGH,
-                LocalDate.of(2026, 7, 20),
+                LocalDate.of(2026, Month.JULY, 20),
                 1L))
                 .thenThrow(new RuntimeException("missing task"));
 

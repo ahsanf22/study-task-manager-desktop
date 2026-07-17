@@ -43,15 +43,18 @@ class CategoryAdditionalCoverageTest {
         differentIdentifier.setId(2L);
 
         Category unsavedCategory = new Category("History");
+        Category anotherUnsavedCategory = new Category("Unsaved Copy");
 
-        assertThat(category).isEqualTo(category);
-        assertThat(category).isEqualTo(sameIdentifier);
-        assertThat(category).isNotEqualTo(differentIdentifier);
-        assertThat(category).isNotEqualTo(unsavedCategory);
-        assertThat(unsavedCategory).isNotEqualTo(category);
-        assertThat(unsavedCategory).isNotEqualTo(new Category("Unsaved Copy"));
-        assertThat(category).isNotEqualTo("Math");
-        assertThat(category).isNotEqualTo(null);
+        assertThat(category)
+                .isEqualTo(sameIdentifier)
+                .isNotEqualTo(differentIdentifier)
+                .isNotEqualTo(unsavedCategory);
+
+        assertThat(category.equals(category)).isTrue();
+        assertThat(category.equals("Math")).isFalse();
+        assertThat(category.equals(null)).isFalse();
+        assertThat(unsavedCategory.equals(category)).isFalse();
+        assertThat(unsavedCategory.equals(anotherUnsavedCategory)).isFalse();
         assertThat(category.hashCode()).isEqualTo(31);
     }
 }

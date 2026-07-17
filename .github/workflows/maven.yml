@@ -33,7 +33,7 @@ jobs:
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
         run: |
-          curl -L https://github.com/coverallsapp/coverage-reporter/releases/latest/download/coveralls-linux.tar.gz -o coveralls-linux.tar.gz
+          curl --proto '=https' --tlsv1.2 --fail --location --silent --show-error https://github.com/coverallsapp/coverage-reporter/releases/latest/download/coveralls-linux.tar.gz -o coveralls-linux.tar.gz
           tar -xzf coveralls-linux.tar.gz
           ./coveralls report target/site/jacoco/jacoco.xml --format=jacoco --repo-token="$COVERALLS_REPO_TOKEN" --service-name=github-actions
 

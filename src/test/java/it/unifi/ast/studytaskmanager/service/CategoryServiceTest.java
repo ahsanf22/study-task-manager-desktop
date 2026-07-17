@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -12,7 +13,6 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import it.unifi.ast.studytaskmanager.exception.CategoryInUseException;
 import it.unifi.ast.studytaskmanager.exception.DuplicateCategoryNameException;
@@ -30,8 +30,8 @@ class CategoryServiceTest {
 
     @BeforeEach
     void setUp() {
-        categoryRepository = Mockito.mock(CategoryRepository.class);
-        studyTaskRepository = Mockito.mock(StudyTaskRepository.class);
+        categoryRepository = mock(CategoryRepository.class);
+        studyTaskRepository = mock(StudyTaskRepository.class);
         categoryService = new CategoryService(
                 new ImmediateTransactionManager(),
                 categoryRepository,

@@ -1,6 +1,7 @@
 package it.unifi.ast.studytaskmanager.gui;
 
 import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 
 public class MainFrame extends JFrame {
 

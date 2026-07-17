@@ -3,6 +3,7 @@ package it.unifi.ast.studytaskmanager.model;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
+import java.time.Month;
 
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +17,7 @@ class StudyTaskTest {
                 "Study algebra",
                 "Revise linear equations",
                 Priority.HIGH,
-                LocalDate.of(2026, 7, 20),
+                LocalDate.of(2026, Month.JULY, 20),
                 category);
 
         assertThat(task.getTitle()).isEqualTo("Study algebra");
@@ -30,7 +31,7 @@ class StudyTaskTest {
                 "Study algebra",
                 "Revise linear equations",
                 Priority.HIGH,
-                LocalDate.of(2026, 7, 20),
+                LocalDate.of(2026, Month.JULY, 20),
                 new Category("Math"));
 
         task.markCompleted();
@@ -44,7 +45,7 @@ class StudyTaskTest {
                 "Study algebra",
                 "Revise linear equations",
                 Priority.HIGH,
-                LocalDate.of(2026, 7, 20),
+                LocalDate.of(2026, Month.JULY, 20),
                 new Category("Math"));
 
         task.markCompleted();
@@ -59,7 +60,7 @@ class StudyTaskTest {
                 "  Study algebra  ",
                 "Revise linear equations",
                 Priority.HIGH,
-                LocalDate.of(2026, 7, 20),
+                LocalDate.of(2026, Month.JULY, 20),
                 new Category("Math"));
 
         assertThat(task.getTitle()).isEqualTo("Study algebra");

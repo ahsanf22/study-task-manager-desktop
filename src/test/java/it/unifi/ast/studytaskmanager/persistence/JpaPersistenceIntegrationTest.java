@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -88,7 +89,7 @@ class JpaPersistenceIntegrationTest {
                 "Study algebra",
                 "Revise equations",
                 Priority.HIGH,
-                LocalDate.of(2026, 7, 20),
+                LocalDate.of(2026, Month.JULY, 20),
                 categoryId);
 
         assertThat(studyTaskService.findAll())
@@ -107,7 +108,7 @@ class JpaPersistenceIntegrationTest {
                 "Study algebra",
                 "Revise equations",
                 Priority.HIGH,
-                LocalDate.of(2026, 7, 20),
+                LocalDate.of(2026, Month.JULY, 20),
                 categoryId);
 
         studyTaskService.markCompleted(task.getId());
@@ -127,14 +128,14 @@ class JpaPersistenceIntegrationTest {
                 "Study algebra",
                 "Revise equations",
                 Priority.HIGH,
-                LocalDate.of(2026, 7, 20),
+                LocalDate.of(2026, Month.JULY, 20),
                 mathCategoryId);
 
         studyTaskService.createTask(
                 "Read physics",
                 "Revise mechanics",
                 Priority.MEDIUM,
-                LocalDate.of(2026, 7, 21),
+                LocalDate.of(2026, Month.JULY, 21),
                 scienceCategoryId);
 
         assertThat(studyTaskService.findByCategory(mathCategoryId))
@@ -156,7 +157,7 @@ class JpaPersistenceIntegrationTest {
                 "Study geometry",
                 "Revise triangles",
                 Priority.LOW,
-                LocalDate.of(2026, 7, 22),
+                LocalDate.of(2026, Month.JULY, 22),
                 mathCategoryId);
 
         assertThat(studyTaskService.findById(algebraTask.getId()).getTitle())
@@ -181,7 +182,7 @@ class JpaPersistenceIntegrationTest {
                 "Study algebra",
                 "Revise equations",
                 Priority.HIGH,
-                LocalDate.of(2026, 7, 20),
+                LocalDate.of(2026, Month.JULY, 20),
                 categoryId);
 
         assertThatThrownBy(() -> categoryService.deleteCategory(categoryId))

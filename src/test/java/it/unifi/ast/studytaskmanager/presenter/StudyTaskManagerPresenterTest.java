@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 import java.util.Optional;
 
@@ -154,7 +155,7 @@ class StudyTaskManagerPresenterTest {
                 " Read Chapter 1 ",
                 " RRTC preparation ",
                 Priority.HIGH,
-                LocalDate.of(2026, 7, 20),
+                LocalDate.of(2026, Month.JULY, 20),
                 1L);
 
         when(categoryService.findAll()).thenReturn(categories);
@@ -170,7 +171,7 @@ class StudyTaskManagerPresenterTest {
                 "Read Chapter 1",
                 "RRTC preparation",
                 Priority.HIGH,
-                LocalDate.of(2026, 7, 20),
+                LocalDate.of(2026, Month.JULY, 20),
                 1L);
         verify(categoryService, times(2)).findAll();
         verify(view).showCategories(categories);
@@ -371,7 +372,7 @@ class StudyTaskManagerPresenterTest {
                 " Updated Task ",
                 " Updated description ",
                 Priority.MEDIUM,
-                LocalDate.of(2026, 7, 21),
+                LocalDate.of(2026, Month.JULY, 21),
                 1L);
 
         when(view.selectedTaskIds()).thenReturn(List.of(1L));
@@ -389,7 +390,7 @@ class StudyTaskManagerPresenterTest {
                 "Updated Task",
                 "Updated description",
                 Priority.MEDIUM,
-                LocalDate.of(2026, 7, 21),
+                LocalDate.of(2026, Month.JULY, 21),
                 1L);
         verify(categoryService, times(2)).findAll();
         verify(view).showCategories(categories);
@@ -515,7 +516,7 @@ class StudyTaskManagerPresenterTest {
                 "Study algebra",
                 "Description",
                 Priority.HIGH,
-                LocalDate.of(2026, 7, 20),
+                LocalDate.of(2026, Month.JULY, 20),
                 new Category("Math"));
 
         when(view.taskSearchText()).thenReturn(" algebra ");

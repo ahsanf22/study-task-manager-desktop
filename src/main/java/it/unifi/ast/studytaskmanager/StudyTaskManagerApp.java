@@ -20,6 +20,7 @@ public final class StudyTaskManagerApp {
         SwingUtilities.invokeLater(StudyTaskManagerApp::showApplication);
     }
 
+    @SuppressWarnings("java:S2095")
     static void showApplication() {
         try {
             ApplicationConfiguration configuration = ApplicationConfiguration.create();

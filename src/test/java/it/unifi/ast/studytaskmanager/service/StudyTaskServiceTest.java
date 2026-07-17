@@ -4,16 +4,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import it.unifi.ast.studytaskmanager.exception.ResourceNotFoundException;
 import it.unifi.ast.studytaskmanager.model.Category;
@@ -32,8 +33,8 @@ class StudyTaskServiceTest {
 
     @BeforeEach
     void setUp() {
-        studyTaskRepository = Mockito.mock(StudyTaskRepository.class);
-        categoryRepository = Mockito.mock(CategoryRepository.class);
+        studyTaskRepository = mock(StudyTaskRepository.class);
+        categoryRepository = mock(CategoryRepository.class);
         studyTaskService = new StudyTaskService(
                 new ImmediateTransactionManager(),
                 studyTaskRepository,
@@ -107,7 +108,7 @@ class StudyTaskServiceTest {
                 "Study algebra",
                 "Revise equations",
                 Priority.HIGH,
-                LocalDate.of(2026, 7, 20),
+                LocalDate.of(2026, Month.JULY, 20),
                 1L);
 
         assertThat(createdTask).isEqualTo(savedTask);
@@ -116,13 +117,15 @@ class StudyTaskServiceTest {
 
     @Test
     void rejectsCreatingTaskWhenCategoryDoesNotExist() {
+        LocalDate deadline = LocalDate.of(2026, Month.JULY, 20);
+
         when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> studyTaskService.createTask(
                 "Study algebra",
                 "Revise equations",
                 Priority.HIGH,
-                LocalDate.of(2026, 7, 20),
+                deadline,
                 1L))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("Category not found with id: 1");
@@ -144,18 +147,20 @@ class StudyTaskServiceTest {
                 "Study geometry",
                 "Revise triangles",
                 Priority.MEDIUM,
-                LocalDate.of(2026, 7, 21),
+                LocalDate.of(2026, Month.JULY, 21),
                 2L);
 
         assertThat(updatedTask.getTitle()).isEqualTo("Study geometry");
         assertThat(updatedTask.getDescription()).isEqualTo("Revise triangles");
         assertThat(updatedTask.getPriority()).isEqualTo(Priority.MEDIUM);
-        assertThat(updatedTask.getDeadline()).isEqualTo(LocalDate.of(2026, 7, 21));
+        assertThat(updatedTask.getDeadline()).isEqualTo(LocalDate.of(2026, Month.JULY, 21));
         verify(studyTaskRepository).save(task);
     }
 
     @Test
     void rejectsUpdatingMissingTask() {
+        LocalDate deadline = LocalDate.of(2026, Month.JULY, 21);
+
         when(studyTaskRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> studyTaskService.updateTask(
@@ -163,7 +168,7 @@ class StudyTaskServiceTest {
                 "Study geometry",
                 "Revise triangles",
                 Priority.MEDIUM,
-                LocalDate.of(2026, 7, 21),
+                deadline,
                 2L))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("Task not found with id: 1");
@@ -225,7 +230,7 @@ class StudyTaskServiceTest {
                 title,
                 "Description",
                 Priority.HIGH,
-                LocalDate.of(2026, 7, 20),
+                LocalDate.of(2026, Month.JULY, 20),
                 category());
     }
 

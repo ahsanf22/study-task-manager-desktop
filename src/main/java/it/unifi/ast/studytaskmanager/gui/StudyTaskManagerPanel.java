@@ -2,6 +2,7 @@ package it.unifi.ast.studytaskmanager.gui;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -149,7 +150,7 @@ public class StudyTaskManagerPanel extends JPanel implements StudyTaskManagerVie
     public Optional<TaskFormData> askForTaskDetails(List<Category> categories, String dialogTitle) {
         JTextField titleField = new JTextField();
         JTextField descriptionField = new JTextField();
-        JTextField deadlineField = new JTextField(LocalDate.now().plusDays(7).toString());
+        JTextField deadlineField = new JTextField(LocalDate.now(Clock.systemDefaultZone()).plusDays(7).toString());
 
         JComboBox<Priority> priorityComboBox = new JComboBox<>(Priority.values());
         JComboBox<CategoryItem> categoryComboBox = new JComboBox<>(
