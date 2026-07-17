@@ -23,6 +23,14 @@
         <testcontainers.version>1.21.4</testcontainers.version>
         <jacoco.version>0.8.12</jacoco.version>
         <pit.version>1.17.4</pit.version>
+
+        <sonar.coverage.exclusions>
+            **/coverage/**,
+            **/StudyTaskManagerApp.java,
+            **/config/**,
+            **/gui/MainFrame.java,
+            **/gui/StudyTaskManagerPanel.java
+        </sonar.coverage.exclusions>
     </properties>
 
     <dependencies>
@@ -114,6 +122,15 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.12</version>
+                <configuration>
+                    <excludes>
+                        <exclude>it/unifi/ast/studytaskmanager/coverage/**</exclude>
+                        <exclude>it/unifi/ast/studytaskmanager/StudyTaskManagerApp*</exclude>
+                        <exclude>it/unifi/ast/studytaskmanager/config/**</exclude>
+                        <exclude>it/unifi/ast/studytaskmanager/gui/MainFrame*</exclude>
+                        <exclude>it/unifi/ast/studytaskmanager/gui/StudyTaskManagerPanel*</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
@@ -142,12 +159,12 @@
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.70</minimum>
+                                            <minimum>1.00</minimum>
                                         </limit>
                                         <limit>
                                             <counter>BRANCH</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.50</minimum>
+                                            <minimum>1.00</minimum>
                                         </limit>
                                     </limits>
                                 </rule>

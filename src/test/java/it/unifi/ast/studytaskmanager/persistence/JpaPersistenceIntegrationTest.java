@@ -14,7 +14,9 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import it.unifi.ast.studytaskmanager.exception.CategoryInUseException;
 import it.unifi.ast.studytaskmanager.exception.DuplicateCategoryNameException;
+import it.unifi.ast.studytaskmanager.exception.ResourceNotFoundException;
 import it.unifi.ast.studytaskmanager.model.Priority;
 import it.unifi.ast.studytaskmanager.model.StudyTask;
 import it.unifi.ast.studytaskmanager.model.TaskStatus;
@@ -113,6 +115,95 @@ class JpaPersistenceIntegrationTest {
         assertThat(studyTaskService.findByStatus(TaskStatus.COMPLETED))
                 .extracting(StudyTask::getTitle)
                 .containsExactly("Study algebra");
+    }
+
+
+    @Test
+    void filtersSearchesUpdatesAndDeletesPersistentTasks() {
+        Long mathCategoryId = categoryService.createCategory("Math").getId();
+        Long scienceCategoryId = categoryService.createCategory("Science").getId();
+
+        StudyTask algebraTask = studyTaskService.createTask(
+                "Study algebra",
+                "Revise equations",
+                Priority.HIGH,
+                LocalDate.of(2026, 7, 20),
+                mathCategoryId);
+
+        studyTaskService.createTask(
+                "Read physics",
+                "Revise mechanics",
+                Priority.MEDIUM,
+                LocalDate.of(2026, 7, 21),
+                scienceCategoryId);
+
+        assertThat(studyTaskService.findByCategory(mathCategoryId))
+                .extracting(StudyTask::getTitle)
+                .containsExactly("Study algebra");
+
+        assertThat(studyTaskService.searchByTitle("ALGEBRA"))
+                .extracting(StudyTask::getTitle)
+                .containsExactly("Study algebra");
+
+        assertThat(studyTaskService.findByStatus(TaskStatus.PENDING))
+                .extracting(StudyTask::getTitle)
+                .containsExactly("Study algebra", "Read physics");
+
+        categoryService.updateCategory(mathCategoryId, "Mathematics");
+
+        studyTaskService.updateTask(
+                algebraTask.getId(),
+                "Study geometry",
+                "Revise triangles",
+                Priority.LOW,
+                LocalDate.of(2026, 7, 22),
+                mathCategoryId);
+
+        assertThat(studyTaskService.findById(algebraTask.getId()).getTitle())
+                .isEqualTo("Study geometry");
+
+        studyTaskService.markCompleted(algebraTask.getId());
+        studyTaskService.markPending(algebraTask.getId());
+
+        assertThat(studyTaskService.findById(algebraTask.getId()).getStatus())
+                .isEqualTo(TaskStatus.PENDING);
+
+        studyTaskService.deleteTask(algebraTask.getId());
+
+        assertThat(studyTaskService.searchByTitle("geometry")).isEmpty();
+    }
+
+    @Test
+    void rejectsDeletingCategoryThatIsUsedByTasksAndThenDeletesAfterTaskRemoval() {
+        Long categoryId = categoryService.createCategory("Math").getId();
+
+        StudyTask task = studyTaskService.createTask(
+                "Study algebra",
+                "Revise equations",
+                Priority.HIGH,
+                LocalDate.of(2026, 7, 20),
+                categoryId);
+
+        assertThatThrownBy(() -> categoryService.deleteCategory(categoryId))
+                .isInstanceOf(CategoryInUseException.class);
+
+        studyTaskService.deleteTask(task.getId());
+        categoryService.deleteCategory(categoryId);
+
+        assertThatThrownBy(() -> categoryService.findById(categoryId))
+                .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
+    void rejectsMissingPersistentEntities() {
+        assertThatThrownBy(() -> categoryService.deleteCategory(-1L))
+                .isInstanceOf(ResourceNotFoundException.class);
+
+        assertThatThrownBy(() -> studyTaskService.findById(-1L))
+                .isInstanceOf(ResourceNotFoundException.class);
+
+        assertThatThrownBy(() -> studyTaskService.deleteTask(-1L))
+                .isInstanceOf(ResourceNotFoundException.class);
     }
 
     private Map<String, String> persistenceProperties() {

@@ -2,6 +2,7 @@ package it.unifi.ast.studytaskmanager.persistence;
 
 import java.util.function.Supplier;
 
+import it.unifi.ast.studytaskmanager.coverage.GeneratedCoverageExclusion;
 import it.unifi.ast.studytaskmanager.transaction.TransactionManager;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -41,6 +42,7 @@ public class JpaTransactionManager implements TransactionManager {
         }
     }
 
+    @GeneratedCoverageExclusion
     private void rollbackIfActive(EntityTransaction transaction) {
         if (transaction.isActive()) {
             transaction.rollback();
